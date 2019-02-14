@@ -64,12 +64,14 @@ class ServerlessLayers {
 
   async publishLayerVersion() {
     const bucketName = await this.getBucketName()
+    const packagesTags = this.getDependenciesList().join('\n')
     const params = {
       Content: {
         S3Bucket: bucketName,
         S3Key: path.join(this.getBucketLayersPath(), this.getStackName() + '.zip')
       },
       LayerName: this.getStackName(),
+      Description: 'created by serverless-layers: ' + packagesTags,
       CompatibleRuntimes: [ 'nodejs' ]
     }
     return this.provider.request('Lambda', 'publishLayerVersion', params)
