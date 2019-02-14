@@ -4,8 +4,6 @@ const mkdirp = require('mkdirp')
 const fs = require('fs')
 const path = require('path')
 const archiver = require('archiver')
-const { spawnSync} = require('child_process');
-const AWS = require('aws-sdk')
 
 const MAX_LAYER_MB_SIZE = 250
 
@@ -320,7 +318,7 @@ class ServerlessLayers {
     const currentLayerARN = await this.getLayerArn()
     const functions = this.service.functions
     for (const funcName in this.service.functions) {
-      this.log(`function:${funcName} = layer:${currentLayerARN}`)
+      this.log(`function.${funcName} = layers.${currentLayerARN}`)
     }
   }
 
