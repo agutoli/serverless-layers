@@ -33,6 +33,7 @@
     "npm-install-package": "^2.1.0"
   },
   "devDependencies": {
+    "aws-sdk": "^2.402.0",
     "chai": "^4.2.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^17.1.0",

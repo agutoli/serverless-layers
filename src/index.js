@@ -5,6 +5,9 @@ const fs = require('fs')
 const path = require('path')
 const archiver = require('archiver')
 const { spawnSync} = require('child_process');
+const AWS = require('aws-sdk')
+
+const MAX_LAYER_MB_SIZE = 250
 
 class ServerlessLayers {
   constructor(serverless, options) {
@@ -65,22 +68,20 @@ class ServerlessLayers {
         return output.OutputValue
       })
   }
-// aws s3 ls s3://scup-serverless-deployments-qa/serverless/scup-bus-v1/qa/layers
+
   async publishLayerVersion() {
     const params = {
       Content: {
         S3Bucket: this.getBucketName(),
-        S3Key: path.join(this.getBucketLayersPath(), this.getStackName() + '.zip'),
-        // S3ObjectVersion: '2',
-        // ZipFile: "sadasdas"
+        S3Key: path.join(this.getBucketLayersPath(), this.getStackName() + '.zip')
       },
       LayerName: this.getStackName(),
       CompatibleRuntimes: [ 'nodejs' ]
     }
     return this.provider.request('Lambda', 'publishLayerVersion', params)
       .then((result) => {
-        console.log(result);
-        // return this.log("Upload complete...")
+        this.log("New version published...")
+        return result
       })
       .catch(e => {
         console.log(e.message)
@@ -96,9 +97,25 @@ class ServerlessLayers {
     return new Promise((resolve) => {
       const layersDir = path.join(process.cwd(), this.settings.compileDir)
       const oldCwd = process.cwd()
-
-      const output = fs.createWriteStream(this.getPathZipFileName())
+      const zipFileName = this.getPathZipFileName()
+      const output = fs.createWriteStream(zipFileName)
       const zip = archiver.create('zip')
+
+      output.on('close', () => {
+        const MB = (zip.pointer()/1024/1024).toFixed(1)
+
+        if (MB > MAX_LAYER_MB_SIZE) {
+          this.log("Package error!")
+          throw new Error(
+            "Layers can't exceed the unzipped deployment package size limit of 250 MB! \n" +
+            "Read more: https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html\n\n"
+          )
+        }
+
+        console.log('Layers: Created package ', zipFileName, MB + 'MB');
+        this.log(`Created package ${zipFileName} ${MB} MB`)
+        resolve()
+      })
 
       zip.on('error', (err) => {
         reject(err)
@@ -114,7 +131,6 @@ class ServerlessLayers {
       zip.finalize()
         .then(() => {
           process.chdir(oldCwd)
-          resolve()
         })
     })
   }
@@ -123,11 +139,10 @@ class ServerlessLayers {
     const params = {
       Bucket: this.getBucketName(),
       Key: path.join(this.getBucketLayersPath(), this.getStackName() + '.zip'),
-      ContentType: "application/zip",
-      ContentEncoding: "7bit",
       Body: fs.createReadStream(this.getPathZipFileName())
     }
-    return this.provider.request('S3', 'upload', params)
+
+    return this.provider.request('S3', 'putObject', params)
       .then((result) => {
         this.log("Upload complete...")
         return result
@@ -187,8 +202,33 @@ class ServerlessLayers {
   async getLayerArn() {
     const outputs = await this.getOutputs()
     if (!outputs) return
-    const logicalId = this.provider.naming.getLambdaLayerOutputLogicalId(this.settings.layerName)
+    const logicalId = this.getOutputLogicalId()
     return (outputs.find(x => x.OutputKey === logicalId)||{}).OutputValue
+  }
+
+  getOutputLogicalId() {
+    return this.provider.naming.getLambdaLayerOutputLogicalId(this.getStackName())
+  }
+
+  relateLayerWithFunctions(layerArn) {
+    const functions = this.service.functions
+    for (const funcName in this.service.functions) {
+      functions[funcName].layers = functions[funcName].layers || []
+      functions[funcName].layers.push(layerArn)
+    }
+
+    this.service.resources = this.service.resources || {}
+    this.service.resources.Outputs = this.service.resources.Outputs || {}
+
+    const outputName = this.getOutputLogicalId()
+    Object.assign(this.service.resources.Outputs, {
+      [outputName]: {
+        Value: layerArn,
+        Export: {
+          Name: outputName
+        }
+      }
+    })
   }
 
   async main() {
@@ -200,43 +240,20 @@ class ServerlessLayers {
       await this.installDependencies()
     }
 
-    const res = await this.getLayerArn()
-    // console.log(this.provider.naming.getLambdaLayerOutputLogicalId(this.settings.layerName))
-    // console.log(this.provider.naming.getLambdaLayerLogicalId(this.settings.layerName))
+    const isDifferent = await this.isDiff(remotePackage.dependencies, this.localPackage.dependencies)
+    const currentLayerARN = await this.getLayerArn()
 
-    await this.installDependencies()
+    if (!isDifferent && currentLayerARN) {
+      this.relateLayerWithFunctions(currentLayerARN)
+      return
+    }
+
+    await this.uploadPackageJson()
     await this.createPackageLayer()
     await this.uploadPackageLayer()
-    // await this.publishLayerVersion()
+    const version = await this.publishLayerVersion()
 
-    // const outputs = await this.getOutputs()
-
-    // this.service.layers = {
-    //   test: {
-    //     path: ".layers/"
-    //   }
-    // }
-    //
-    // const functions = this.service.functions
-    // for (const funcName in this.service.functions) {
-    //   functions[funcName].layers = functions[funcName].layers || []
-    //
-    //   functions[funcName].layers.push('{Ref: test}')
-    //   console.log(this.service.functions[funcName].layers);
-    // }
-  //   layers:
-  // hello:
-
-    // const remotePackage = await this.downloadPackageJson()
-    //
-    // if (!remotePackage) {
-    //   console.log("diferente");
-    // }
-    //
-    // const isDifferent = await this.isDiff(remotePackage.dependencies, this.localPackage.dependencies)
-    // console.log(isDifferent);
-
-    // await this.uploadPackageJson()
+    this.relateLayerWithFunctions(version.LayerVersionArn)
   }
 
   isDiff(depsA, depsB) {
