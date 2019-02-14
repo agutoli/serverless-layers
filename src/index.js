@@ -23,10 +23,10 @@ class ServerlessLayers {
 
     // hooks
     this.hooks = {
-      'package:createDeploymentArtifacts': () => BbPromise.bind(this)
+      'package:initialize': () => BbPromise.bind(this)
         .then(() => this.main()),
       'aws:info:displayLayers': () => BbPromise.bind(this)
-          .then(() => this.finalizeDeploy())
+        .then(() => this.finalizeDeploy())
     }
 
     const inboundSettings = (serverless.service.custom || {})['serverless-layers'];
@@ -54,25 +54,12 @@ class ServerlessLayers {
   }
 
   getBucketName() {
-    if (this.service.provider.deploymentBucket) {
-      return this.service.provider.deploymentBucket
+    if (!this.service.provider.deploymentBucket) {
+      throw new Error(
+        'Please, you should specify "deploymentBucket" for this plugin!\n'
+      )
     }
-
-    if (this.cacheObject.bucketName) {
-      return this.cacheObject.bucketName
-    }
-
-    return this.getOutputs()
-      .then(Outputs => {
-        const output = Outputs.find(x => x.OutputKey === 'ServerlessDeploymentBucketName')
-
-        if (!output) {
-          return null
-        }
-
-        this.cacheObject.bucketName = output.OutputValue
-        return output.OutputValue
-      })
+    return this.service.provider.deploymentBucket
   }
 
   async publishLayerVersion() {
@@ -88,6 +75,7 @@ class ServerlessLayers {
     return this.provider.request('Lambda', 'publishLayerVersion', params)
       .then((result) => {
         this.log("New layer version published...")
+        this.cacheObject.LayerVersionArn = result.LayerVersionArn
         return result
       })
       .catch(e => {
@@ -119,7 +107,7 @@ class ServerlessLayers {
           )
         }
 
-        this.log(`Created layer package ${zipFileName} (${MB}MB)`);
+        this.log(`Created layer package ${zipFileName} (${MB} MB)`);
         resolve()
       })
 
@@ -207,6 +195,9 @@ class ServerlessLayers {
   }
 
   async getLayerArn() {
+    if (this.cacheObject.LayerVersionArn) {
+      return this.cacheObject.LayerVersionArn
+    }
     const outputs = await this.getOutputs()
     if (!outputs) return
     const logicalId = this.getOutputLogicalId()
@@ -224,7 +215,7 @@ class ServerlessLayers {
     for (const funcName in this.service.functions) {
       functions[funcName].layers = functions[funcName].layers || []
       functions[funcName].layers.push(layerArn)
-      this.log('function.' + funcName + ' OK...')
+      this.log('function.' + funcName + ' - ' + layerArn)
     }
 
     this.service.resources = this.service.resources || {}
