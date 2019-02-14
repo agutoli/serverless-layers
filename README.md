@@ -10,8 +10,17 @@
 
 Add the plugin to your `serverless.yml` file:
 
+`ATENTION`
+
+Param `deploymentBucket` is required!
+
 ## Serverless configuration
 ```yaml
+provider:
+  ...
+  deploymentBucket: #required!
+    name: "your_bucket"
+
 package:
   individually: false
   exclude:
@@ -21,8 +30,6 @@ package:
 plugins:
   - serverless-layers
 ```
-
-`Note:` If you did not specify any configuration, plugins will consider root folder and stage options ex.
 
 ## Contributing
 
