@@ -4,8 +4,8 @@
 [![NPM](https://img.shields.io/npm/v/serverless-layers.svg)](https://www.npmjs.com/package/serverless-layers)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
-* Automaticaly attach layers for each lambda function
-* Create a new layer version when `package.json` was updated
+* Automatically attach layers for each lambda function
+* Creates a new layer version when `package.json` was updated
 * If package.json was not changed, it does not publish a new layer
 * Reduces drastically lambda size
 * It reduces deployment time.
