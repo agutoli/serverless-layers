@@ -25,13 +25,15 @@ class ServerlessLayers {
 
     // hooks
     this.hooks = {
-      'package:initialize': () => BbPromise.bind(this)
-        .then(() => this.main())
+      'package:createDeploymentArtifacts': () => BbPromise.bind(this)
+        .then(() => this.main()),
+      'aws:info:displayLayers': () => BbPromise.bind(this)
+          .then(() => this.finalizeDeploy())
     }
 
     const inboundSettings = (serverless.service.custom || {})['serverless-layers'];
     const defaultSettings = {
-      compileDir: '.layers-build',
+      compileDir: '.serverless',
       packagePath: path.join(process.env.PWD, `package.json`),
     }
 
@@ -48,6 +50,9 @@ class ServerlessLayers {
     const logicalId = this.provider.naming.getDeploymentBucketOutputLogicalId()
     return this.provider.request('CloudFormation', 'describeStacks', params)
       .then(({ Stacks }) => Stacks && Stacks[0].Outputs)
+      .catch(e => {
+        return []
+      })
   }
 
   getBucketName() {
@@ -61,8 +66,11 @@ class ServerlessLayers {
 
     return this.getOutputs()
       .then(Outputs => {
-        const output = Outputs.find(x => x.OutputKey === logicalId)
-        if (!output) return null
+        const output = Outputs.find(x => x.OutputKey === 'ServerlessDeploymentBucketName')
+
+        if (!output) {
+          return null
+        }
 
         this.cacheObject.bucketName = output.OutputValue
         return output.OutputValue
@@ -70,9 +78,10 @@ class ServerlessLayers {
   }
 
   async publishLayerVersion() {
+    const bucketName = await this.getBucketName()
     const params = {
       Content: {
-        S3Bucket: this.getBucketName(),
+        S3Bucket: bucketName,
         S3Key: path.join(this.getBucketLayersPath(), this.getStackName() + '.zip')
       },
       LayerName: this.getStackName(),
@@ -80,7 +89,7 @@ class ServerlessLayers {
     }
     return this.provider.request('Lambda', 'publishLayerVersion', params)
       .then((result) => {
-        this.log("New version published...")
+        this.log("New layer version published...")
         return result
       })
       .catch(e => {
@@ -112,8 +121,7 @@ class ServerlessLayers {
           )
         }
 
-        console.log('Layers: Created package ', zipFileName, MB + 'MB');
-        this.log(`Created package ${zipFileName} ${MB} MB`)
+        this.log(`Created layer package ${zipFileName} (${MB}MB)`);
         resolve()
       })
 
@@ -136,15 +144,18 @@ class ServerlessLayers {
   }
 
   async uploadPackageLayer() {
+    this.log("Uploading layer package...")
+
+    const bucketName = await this.getBucketName()
     const params = {
-      Bucket: this.getBucketName(),
+      Bucket: bucketName,
       Key: path.join(this.getBucketLayersPath(), this.getStackName() + '.zip'),
       Body: fs.createReadStream(this.getPathZipFileName())
     }
 
     return this.provider.request('S3', 'putObject', params)
       .then((result) => {
-        this.log("Upload complete...")
+        this.log("OK...")
         return result
       })
       .catch(e => {
@@ -153,18 +164,19 @@ class ServerlessLayers {
       })
   }
 
-  uploadPackageJson() {
-    this.log("Uploading package.json to bucket...")
+  async uploadPackageJson() {
+    this.log("Uploading remote package.json...")
 
+    const bucketName = await this.getBucketName()
     const params = {
-      Bucket: this.getBucketName(),
+      Bucket: bucketName,
       Key: path.join(this.getBucketLayersPath(), 'package.json'),
       Body: fs.createReadStream(this.settings.packagePath)
     }
-
     return this.provider.request('S3', 'putObject', params)
-      .then(() => {
-        return this.log("Upload complete...")
+      .then((result) => {
+        this.log("OK...")
+        return result
       })
       .catch(e => {
         console.log(e.message)
@@ -172,19 +184,16 @@ class ServerlessLayers {
       })
   }
 
-  downloadPackageJson() {
+  async downloadPackageJson() {
     this.log("Downloading package.json from bucket...")
-
+    const bucketName = await this.getBucketName()
     const params = {
-      Bucket: this.getBucketName(),
+      Bucket: bucketName,
       Key: path.join(this.getBucketLayersPath(), 'package.json')
     }
-
     return this.provider.request('S3', 'getObject', params)
-    .then((result) => {
-      this.log("Download success...")
-      return JSON.parse(result.Body.toString())
-    }).catch(e => {
+    .then((result) => JSON.parse(result.Body.toString()))
+    .catch(e => {
       this.log("package.json does not exists at bucket...")
       return null
     })
@@ -211,10 +220,13 @@ class ServerlessLayers {
   }
 
   relateLayerWithFunctions(layerArn) {
+    this.log('Associating layers...')
+
     const functions = this.service.functions
     for (const funcName in this.service.functions) {
       functions[funcName].layers = functions[funcName].layers || []
       functions[funcName].layers.push(layerArn)
+      this.log('function.' + funcName + ' OK...')
     }
 
     this.service.resources = this.service.resources || {}
@@ -236,24 +248,27 @@ class ServerlessLayers {
 
     const remotePackage = await this.downloadPackageJson()
 
-    if (!remotePackage) {
-      await this.installDependencies()
+    let isDifferent = true
+    if (remotePackage) {
+      this.log(`Comparing package.json dependencies...`)
+      isDifferent = await this.isDiff(remotePackage.dependencies, this.localPackage.dependencies)
     }
 
-    const isDifferent = await this.isDiff(remotePackage.dependencies, this.localPackage.dependencies)
     const currentLayerARN = await this.getLayerArn()
 
     if (!isDifferent && currentLayerARN) {
+      this.log(`Not has changed! Using same layer arn: ${currentLayerARN}`)
       this.relateLayerWithFunctions(currentLayerARN)
       return
     }
 
+    await this.installDependencies()
     await this.uploadPackageJson()
     await this.createPackageLayer()
     await this.uploadPackageLayer()
     const version = await this.publishLayerVersion()
 
-    this.relateLayerWithFunctions(version.LayerVersionArn)
+    return this.relateLayerWithFunctions(version.LayerVersionArn)
   }
 
   isDiff(depsA, depsB) {
@@ -278,6 +293,8 @@ class ServerlessLayers {
   }
 
   async installDependencies() {
+    this.log(`Dependencies has changed! Re-installing...`)
+
     const initialCwd = process.cwd()
     const nodeJsDir = path.join(process.cwd(), this.settings.compileDir, 'layers', 'nodejs')
 
@@ -299,8 +316,16 @@ class ServerlessLayers {
     })
   }
 
+  async finalizeDeploy() {
+    const currentLayerARN = await this.getLayerArn()
+    const functions = this.service.functions
+    for (const funcName in this.service.functions) {
+      this.log(`function:${funcName} = layer:${currentLayerARN}`)
+    }
+  }
+
   log(msg) {
-    this.serverless.cli.log(`Layers: ${msg}`)
+    this.serverless.cli.log(`[LayersPlugin]: ${msg}`)
   }
 }
 

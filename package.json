@@ -1,7 +1,7 @@
 {
   "name": "serverless-layers",
-  "version": "1.0.12",
-  "description": "Nice serverless plugin to setup environment variables with ini file",
+  "version": "1.0.0",
+  "description": "",
   "main": "src/index.js",
   "bugs": {
     "url": "https://github.com/agutoli/serverless-layers/issues"
@@ -22,8 +22,7 @@
     "Lambda",
     "API Gateway",
     "environment",
-    "env",
-    "ini"
+    "layers"
   ],
   "author": "Bruno Agutoli <bruno.agutoli@gmail.com> (https://github.com/agutoli)",
   "license": "MIT",
@@ -38,8 +37,6 @@
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-nelson": "^0.2.0",
-    "eslint-plugin-import": "^2.14.0",
-    "mocha": "^5.2.0",
-    "sinon": "^7.2.3"
+    "eslint-plugin-import": "^2.14.0"
   }
 }
