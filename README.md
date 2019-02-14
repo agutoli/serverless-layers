@@ -16,9 +16,9 @@
 
 Add the plugin to your `serverless.yml` file:
 
-`ATENTION`
+## ATENTION!
 
-Param `deploymentBucket` is required!
+This plugin requires specify `deploymentBucket`!
 
 ## Serverless configuration
 ```yaml
