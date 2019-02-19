@@ -39,10 +39,18 @@ class ServerlessLayers {
     };
 
     this.settings = Object.assign({}, defaultSettings, inboundSettings);
-    this.localPackage = require(path.join(
+
+    const localpackageJson = path.join(
       process.env.PWD,
       this.settings.packagePath
-    ));
+    );
+
+    try {
+      this.localPackage = require(localpackageJson);
+    } catch(e) {
+      this.log(`Error: Can not find ${localpackageJson}!`);
+      process.exit(1);
+    }
   }
 
   getStackName() {

@@ -46,6 +46,13 @@ plugins:
   - serverless-layers
 ```
 
+## Options
+```yaml
+custom:
+  serverless-layers:
+    packagePath: './myfolder/package.json'
+```
+
 ## Contributing
 
 Yes, thank you!
