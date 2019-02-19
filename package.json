@@ -12,7 +12,7 @@
   },
   "homepage": "https://github.com/agutoli/serverless-layers",
   "scripts": {
-    "pre-commit": "npm run lint",
+    "precommit": "npm run lint",
     "build": "BABEL_ENV=production ./bin/build",
     "test": "mocha test",
     "lint": "eslint src/**/*.js",

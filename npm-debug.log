@@ -1,0 +1,48 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/Users/brunoagutoli/.nvm/versions/node/v6.10.3/bin/node',
+1 verbose cli   '/Users/brunoagutoli/.nvm/versions/node/v6.10.3/bin/npm',
+1 verbose cli   'run',
+1 verbose cli   'lint' ]
+2 info using npm@3.10.10
+3 info using node@v6.10.3
+4 verbose run-script [ 'prelint', 'lint', 'postlint' ]
+5 info lifecycle serverless-layers@1.0.3~prelint: serverless-layers@1.0.3
+6 silly lifecycle serverless-layers@1.0.3~prelint: no script for prelint, continuing
+7 info lifecycle serverless-layers@1.0.3~lint: serverless-layers@1.0.3
+8 verbose lifecycle serverless-layers@1.0.3~lint: unsafe-perm in lifecycle true
+9 verbose lifecycle serverless-layers@1.0.3~lint: PATH: /Users/brunoagutoli/.nvm/versions/node/v6.10.3/lib/node_modules/npm/bin/node-gyp-bin:/Users/brunoagutoli/projetos/serverless-layers/node_modules/.bin:/usr/local/opt/mysql-client/bin:/Users/brunoagutoli/.nvm/versions/node/v6.10.3/bin:/Users/brunoagutoli/.pyenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/brunoagutoli/go-workspace/bin:/usr/local/opt/go/libexec/bin
+10 verbose lifecycle serverless-layers@1.0.3~lint: CWD: /Users/brunoagutoli/projetos/serverless-layers
+11 silly lifecycle serverless-layers@1.0.3~lint: Args: [ '-c', 'eslint src/**/*.js' ]
+12 silly lifecycle serverless-layers@1.0.3~lint: Returned: code: 1  signal: null
+13 info lifecycle serverless-layers@1.0.3~lint: Failed to exec lint script
+14 verbose stack Error: serverless-layers@1.0.3 lint: `eslint src/**/*.js`
+14 verbose stack Exit status 1
+14 verbose stack     at EventEmitter.<anonymous> (/Users/brunoagutoli/.nvm/versions/node/v6.10.3/lib/node_modules/npm/lib/utils/lifecycle.js:255:16)
+14 verbose stack     at emitTwo (events.js:106:13)
+14 verbose stack     at EventEmitter.emit (events.js:191:7)
+14 verbose stack     at ChildProcess.<anonymous> (/Users/brunoagutoli/.nvm/versions/node/v6.10.3/lib/node_modules/npm/lib/utils/spawn.js:40:14)
+14 verbose stack     at emitTwo (events.js:106:13)
+14 verbose stack     at ChildProcess.emit (events.js:191:7)
+14 verbose stack     at maybeClose (internal/child_process.js:886:16)
+14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:226:5)
+15 verbose pkgid serverless-layers@1.0.3
+16 verbose cwd /Users/brunoagutoli/projetos/serverless-layers
+17 error Darwin 17.6.0
+18 error argv "/Users/brunoagutoli/.nvm/versions/node/v6.10.3/bin/node" "/Users/brunoagutoli/.nvm/versions/node/v6.10.3/bin/npm" "run" "lint"
+19 error node v6.10.3
+20 error npm  v3.10.10
+21 error code ELIFECYCLE
+22 error serverless-layers@1.0.3 lint: `eslint src/**/*.js`
+22 error Exit status 1
+23 error Failed at the serverless-layers@1.0.3 lint script 'eslint src/**/*.js'.
+23 error Make sure you have the latest version of node.js and npm installed.
+23 error If you do, this is most likely a problem with the serverless-layers package,
+23 error not with npm itself.
+23 error Tell the author that this fails on your system:
+23 error     eslint src/**/*.js
+23 error You can get information on how to open an issue for this project with:
+23 error     npm bugs serverless-layers
+23 error Or if that isn't available, you can get their info via:
+23 error     npm owner ls serverless-layers
+23 error There is likely additional logging output above.
+24 verbose exit [ 1, true ]
