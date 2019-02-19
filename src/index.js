@@ -29,14 +29,19 @@ class ServerlessLayers {
         .then(() => this.finalizeDeploy())
     }
 
-    const inboundSettings = (serverless.service.custom || {})['serverless-layers'];
+    const inboundSettings = (serverless.service.custom || {})[
+      "serverless-layers"
+    ];
     const defaultSettings = {
-      compileDir: '.serverless',
-      packagePath: path.join(process.env.PWD, `package.json`),
-    }
+      compileDir: ".serverless",
+      packagePath: `package.json`
+    };
 
     this.settings = Object.assign({}, defaultSettings, inboundSettings);
-    this.localPackage = require(defaultSettings.packagePath)
+    this.localPackage = require(path.join(
+      process.env.PWD,
+      this.settings.packagePath
+    ));
   }
 
   getStackName() {
