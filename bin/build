@@ -1,0 +1,3 @@
+babel --copy-files \
+  src/ \
+  --ignore *.test.js  --out-dir ./lib --source-maps

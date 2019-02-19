@@ -13,6 +13,8 @@
 ## Requirements
 
 * Serverless >= 1.34.0 (layers support)
+* Node >= v6.10.3
+* NPM >= 3.10.10
 * AWS only (sorry)
 * A valid package.json file
 

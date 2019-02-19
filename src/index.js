@@ -2,6 +2,7 @@ const BbPromise = require('bluebird');
 const install = require('npm-install-package')
 const mkdirp = require('mkdirp')
 const fs = require('fs')
+const copyFile = require('fs-copy-file') // v6.10.3 support
 const path = require('path')
 const archiver = require('archiver')
 
@@ -296,19 +297,21 @@ class ServerlessLayers {
 
     await mkdirp.sync(nodeJsDir)
 
-    fs.copyFileSync(this.settings.packagePath, path.join(nodeJsDir, 'package.json'));
-
-    // install deps
-    process.chdir(nodeJsDir)
-
-    const opts = { saveDev: false, cache: true, silent: false }
-
     return new Promise((resolve) => {
-      install(this.getDependenciesList(), opts, function (err) {
-        process.chdir(initialCwd);
-        if (err) throw err
-        resolve()
-      })
+      copyFile(this.settings.packagePath, path.join(nodeJsDir, 'package.json'), (err) => {
+        if (err) throw err;
+
+        // install deps
+        process.chdir(nodeJsDir)
+
+        const opts = { saveDev: false, cache: true, silent: false }
+
+        install(this.getDependenciesList(), opts, function (err) {
+          process.chdir(initialCwd);
+          if (err) throw err
+          resolve()
+        })
+      });
     })
   }
 

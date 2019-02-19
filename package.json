@@ -2,7 +2,7 @@
   "name": "serverless-layers",
   "version": "1.0.3",
   "description": "",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "bugs": {
     "url": "https://github.com/agutoli/serverless-layers/issues"
   },
@@ -12,6 +12,7 @@
   },
   "homepage": "https://github.com/agutoli/serverless-layers",
   "scripts": {
+    "build": "BABEL_ENV=production ./bin/build",
     "test": "mocha test",
     "lint": "eslint src/**/*.js test/**/*.js"
   },
@@ -27,17 +28,20 @@
   "author": "Bruno Agutoli <bruno.agutoli@gmail.com> (https://github.com/agutoli)",
   "license": "MIT",
   "dependencies": {
+    "@babel/runtime": "^7.3.1",
     "archiver": "^3.0.0",
     "bluebird": "^3.5.3",
+    "fs-copy-file": "^2.1.2",
     "mkdirp": "^0.5.1",
     "npm-install-package": "^2.1.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.3.3",
+    "@babel/plugin-transform-runtime": "^7.2.0",
+    "@babel/preset-env": "^7.3.1",
     "aws-sdk": "^2.402.0",
     "chai": "^4.2.0",
-    "eslint": "^3.19.0",
-    "eslint-config-airbnb": "^17.1.0",
-    "eslint-config-nelson": "^0.2.0",
-    "eslint-plugin-import": "^2.14.0"
+    "eslint": "^5.14.1"
   }
 }
