@@ -1,6 +1,9 @@
 {
-  "extends": "nelson",
+  "extends": "airbnb",
   "rules": {
+    "arrow-parens": 0,
+    "global-require": 0,
+    "import/no-dynamic-require": 0,
     "no-await-in-loop": 0,
     "brace-style": 0,
     "comma-dangle": 0,
@@ -10,5 +13,6 @@
     "one-var": 0,
     "prefer-rest-params": 0,
     "strict": 0,
+    "no-console": 0
   }
 }

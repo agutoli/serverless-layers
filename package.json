@@ -14,7 +14,8 @@
   "scripts": {
     "build": "BABEL_ENV=production ./bin/build",
     "test": "mocha test",
-    "lint": "eslint src/**/*.js test/**/*.js"
+    "lint": "eslint src/**/*.js",
+    "lint:watch": "nodemon --watch ./src --exec 'npm run lint'"
   },
   "keywords": [
     "Serverless",
@@ -42,6 +43,11 @@
     "@babel/preset-env": "^7.3.1",
     "aws-sdk": "^2.402.0",
     "chai": "^4.2.0",
-    "eslint": "^5.14.1"
+    "eslint": "^5.3.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.12.4",
+    "nodemon": "^1.18.10"
   }
 }
