@@ -10,6 +10,12 @@
 * Reduces drastically lambda size
 * It reduces deployment time.
 
+## Requirements
+
+* Serverless >= 1.34.0 (layers support)
+* AWS only (sorry)
+* A valid package.json file
+
 ## Install
 
 `npm install -D serverless-layers`
