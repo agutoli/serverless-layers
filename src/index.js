@@ -35,7 +35,8 @@ class ServerlessLayers {
     ];
     const defaultSettings = {
       compileDir: '.serverless',
-      packagePath: 'package.json'
+      packagePath: 'package.json',
+      layersDeploymentBucket: this.service.provider.deploymentBucket
     };
 
     this.settings = Object.assign({}, defaultSettings, inboundSettings);
@@ -65,12 +66,12 @@ class ServerlessLayers {
   }
 
   getBucketName() {
-    if (!this.service.provider.deploymentBucket) {
+    if (!this.settings.layersDeploymentBucket) {
       throw new Error(
         'Please, you should specify "deploymentBucket" for this plugin!\n'
       );
     }
-    return this.service.provider.deploymentBucket;
+    return this.settings.layersDeploymentBucket;
   }
 
   async publishLayerVersion() {

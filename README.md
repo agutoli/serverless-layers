@@ -51,6 +51,7 @@ plugins:
 custom:
   serverless-layers:
     packagePath: './myfolder/package.json'
+    layersDeploymentBucket: "your_layers_bucket" # if not specified will get root deploymentBucket
 ```
 
 ## Contributing
