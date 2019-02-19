@@ -47,7 +47,7 @@ class ServerlessLayers {
 
     try {
       this.localPackage = require(localpackageJson);
-    } catch(e) {
+    } catch (e) {
       this.log(`Error: Can not find ${localpackageJson}!`);
       process.exit(1);
     }
