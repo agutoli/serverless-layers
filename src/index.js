@@ -24,15 +24,20 @@ class ServerlessLayers {
 
     // hooks
     this.hooks = {
+      'before:package:initialize': () => BbPromise.bind(this)
+        .then(() => this.init()),
       'package:initialize': () => BbPromise.bind(this)
         .then(() => this.main()),
       'aws:info:displayLayers': () => BbPromise.bind(this)
         .then(() => this.finalizeDeploy())
     };
+  }
 
-    const inboundSettings = (serverless.service.custom || {})[
+  async init() {
+    const inboundSettings = (this.serverless.service.custom || {})[
       'serverless-layers'
     ];
+
     const defaultSettings = {
       compileDir: '.serverless',
       packagePath: 'package.json',
@@ -71,6 +76,7 @@ class ServerlessLayers {
         'Please, you should specify "deploymentBucket" for this plugin!\n'
       );
     }
+    console.log('bucketName:::', this.settings.layersDeploymentBucket);
     return this.settings.layersDeploymentBucket;
   }
 
