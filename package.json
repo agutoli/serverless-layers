@@ -1,6 +1,6 @@
 {
   "name": "serverless-layers",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "",
   "main": "lib/index.js",
   "bugs": {
@@ -15,7 +15,7 @@
     "build": "BABEL_ENV=production ./bin/build",
     "test": "npm run lint",
     "lint": "eslint src/**/*.js",
-    "dev:watch": "nodemon --watch ./src --exec 'npm run build'",
+    "dev:watch": "nodemon --watch ./src --exec 'npm run lint; npm run build'",
     "lint:watch": "nodemon --watch ./src --exec 'npm run lint'"
   },
   "keywords": [

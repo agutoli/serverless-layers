@@ -1,12 +1,11 @@
 const BbPromise = require('bluebird');
-const install = require('npm-install-package');
-const mkdirp = require('mkdirp');
-const fs = require('fs');
-const copyFile = require('fs-copy-file'); // v6.10.3 support
 const path = require('path');
-const archiver = require('archiver');
 
-const MAX_LAYER_MB_SIZE = 250;
+const LayersService = require('./aws/LayersService');
+const BucketService = require('./aws/BucketService');
+const CloudFormationService = require('./aws/CloudFormationService');
+const ZipService = require('./package/ZipService');
+const Dependencies = require('./package/Dependencies');
 
 class ServerlessLayers {
   constructor(serverless, options) {
@@ -14,9 +13,10 @@ class ServerlessLayers {
     this.options = options;
     this.serverless = serverless;
 
-    this.service = serverless.service;
     this.provider = serverless.getProvider('aws');
+    this.service = serverless.service;
     this.options.region = this.provider.getRegion();
+
 
     // bindings
     this.log = this.log.bind(this);
@@ -34,17 +34,13 @@ class ServerlessLayers {
   }
 
   async init() {
-    const inboundSettings = (this.serverless.service.custom || {})[
-      'serverless-layers'
-    ];
+    this.settings = this.getSettings();
 
-    const defaultSettings = {
-      compileDir: '.serverless',
-      packagePath: 'package.json',
-      layersDeploymentBucket: this.service.provider.deploymentBucket
-    };
-
-    this.settings = Object.assign({}, defaultSettings, inboundSettings);
+    this.zipService = new ZipService(this);
+    this.dependencies = new Dependencies(this);
+    this.layersService = new LayersService(this);
+    this.bucketService = new BucketService(this);
+    this.cloudFormationService = new CloudFormationService(this);
 
     const localpackageJson = path.join(
       process.env.PWD,
@@ -59,15 +55,46 @@ class ServerlessLayers {
     }
   }
 
-  getStackName() {
-    return `${this.serverless.service.service}-${this.options.stage}`;
+  getSettings() {
+    const inboundSettings = (this.serverless.service.custom || {})[
+      'serverless-layers'
+    ];
+    const defaultSettings = {
+      compileDir: '.serverless',
+      packagePath: 'package.json',
+      layersDeploymentBucket: this.service.provider.deploymentBucket
+    };
+    return Object.assign({}, defaultSettings, inboundSettings);
   }
 
-  getOutputs() {
-    const params = { StackName: this.getStackName() };
-    return this.provider.request('CloudFormation', 'describeStacks', params)
-      .then(({ Stacks }) => Stacks && Stacks[0].Outputs)
-      .catch(() => []);
+  async main() {
+    const remotePackage = await this.bucketService.downloadPackageJson();
+
+    let isDifferent = true;
+    if (remotePackage) {
+      this.log('Comparing package.json dependencies...');
+      isDifferent = await this.isDiff(remotePackage.dependencies, this.localPackage.dependencies);
+    }
+
+    const currentLayerARN = await this.getLayerArn();
+
+    if (!isDifferent && currentLayerARN) {
+      this.log(`Not has changed! Using same layer arn: ${currentLayerARN}`);
+      this.relateLayerWithFunctions(currentLayerARN);
+      return;
+    }
+
+    await this.dependencies.install()
+    await this.zipService.package();
+    await this.bucketService.uploadZipFile();
+    const version = await this.layersService.publishVersion();
+    await this.bucketService.uploadPackageJson();
+
+    this.relateLayerWithFunctions(version.LayerVersionArn);
+  }
+
+  getStackName() {
+    return `${this.serverless.service.service}-${this.options.stage}`;
   }
 
   getBucketName() {
@@ -76,132 +103,11 @@ class ServerlessLayers {
         'Please, you should specify "deploymentBucket" for this plugin!\n'
       );
     }
-    console.log('bucketName:::', this.settings.layersDeploymentBucket);
     return this.settings.layersDeploymentBucket;
-  }
-
-  async publishLayerVersion() {
-    const bucketName = await this.getBucketName();
-    const params = {
-      Content: {
-        S3Bucket: bucketName,
-        S3Key: `${path.join(this.getBucketLayersPath(), this.getStackName())}.zip`
-      },
-      LayerName: this.getStackName(),
-      Description: 'created by serverless-layers',
-      CompatibleRuntimes: ['nodejs']
-    };
-    return this.provider.request('Lambda', 'publishLayerVersion', params)
-      .then((result) => {
-        this.log('New layer version published...');
-        this.cacheObject.LayerVersionArn = result.LayerVersionArn;
-        return result;
-      })
-      .catch(e => {
-        console.log(e.message);
-        process.exit(1);
-      });
   }
 
   getPathZipFileName() {
     return `${path.join(process.cwd(), this.settings.compileDir, this.getStackName())}.zip`;
-  }
-
-  createPackageLayer() {
-    return new Promise((resolve, reject) => {
-      const layersDir = path.join(process.cwd(), this.settings.compileDir);
-      const oldCwd = process.cwd();
-      const zipFileName = this.getPathZipFileName();
-      const output = fs.createWriteStream(zipFileName);
-      const zip = archiver.create('zip');
-
-      output.on('close', () => {
-        const MB = (zip.pointer() / 1024 / 1024).toFixed(1);
-
-        if (MB > MAX_LAYER_MB_SIZE) {
-          this.log('Package error!');
-          throw new Error(
-            'Layers can\'t exceed the unzipped deployment package size limit of 250 MB! \n'
-          + 'Read more: https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html\n\n'
-          );
-        }
-
-        this.log(`Created layer package ${zipFileName} (${MB} MB)`);
-        resolve();
-      });
-
-      zip.on('error', (err) => {
-        reject(err);
-        process.chdir(oldCwd);
-      });
-
-      process.chdir(layersDir);
-
-      zip.pipe(output);
-
-      zip.directory('layers', false);
-
-      zip.finalize()
-        .then(() => {
-          process.chdir(oldCwd);
-        });
-    });
-  }
-
-  async uploadPackageLayer() {
-    this.log('Uploading layer package...');
-
-    const bucketName = await this.getBucketName();
-    const params = {
-      Bucket: bucketName,
-      Key: `${path.join(this.getBucketLayersPath(), this.getStackName())}.zip`,
-      Body: fs.createReadStream(this.getPathZipFileName())
-    };
-
-    return this.provider.request('S3', 'putObject', params)
-      .then((result) => {
-        this.log('OK...');
-        return result;
-      })
-      .catch(e => {
-        console.log(e.message);
-        process.exit(1);
-      });
-  }
-
-  async uploadPackageJson() {
-    this.log('Uploading remote package.json...');
-
-    const bucketName = await this.getBucketName();
-    const params = {
-      Bucket: bucketName,
-      Key: path.join(this.getBucketLayersPath(), 'package.json'),
-      Body: fs.createReadStream(this.settings.packagePath)
-    };
-    return this.provider.request('S3', 'putObject', params)
-      .then((result) => {
-        this.log('OK...');
-        return result;
-      })
-      .catch(e => {
-        console.log(e.message);
-        process.exit(1);
-      });
-  }
-
-  async downloadPackageJson() {
-    this.log('Downloading package.json from bucket...');
-    const bucketName = await this.getBucketName();
-    const params = {
-      Bucket: bucketName,
-      Key: path.join(this.getBucketLayersPath(), 'package.json')
-    };
-    return this.provider.request('S3', 'getObject', params)
-      .then((result) => JSON.parse(result.Body.toString()))
-      .catch(() => {
-        this.log('package.json does not exists at bucket...');
-        return null;
-      });
   }
 
   getBucketLayersPath() {
@@ -217,7 +123,7 @@ class ServerlessLayers {
     if (this.cacheObject.LayerVersionArn) {
       return this.cacheObject.LayerVersionArn;
     }
-    const outputs = await this.getOutputs();
+    const outputs = await this.cloudFormationService.getOutputs();
     if (!outputs) return null;
     const logicalId = this.getOutputLogicalId();
     return (outputs.find(x => x.OutputKey === logicalId) || {}).OutputValue;
@@ -242,6 +148,7 @@ class ServerlessLayers {
     this.service.resources.Outputs = this.service.resources.Outputs || {};
 
     const outputName = this.getOutputLogicalId();
+
     Object.assign(this.service.resources.Outputs, {
       [outputName]: {
         Value: layerArn,
@@ -250,34 +157,6 @@ class ServerlessLayers {
         }
       }
     });
-  }
-
-  async main() {
-    this.settings.layerName = this.settings.layerName || this.serverless.service.service;
-
-    const remotePackage = await this.downloadPackageJson();
-
-    let isDifferent = true;
-    if (remotePackage) {
-      this.log('Comparing package.json dependencies...');
-      isDifferent = await this.isDiff(remotePackage.dependencies, this.localPackage.dependencies);
-    }
-
-    const currentLayerARN = await this.getLayerArn();
-
-    if (!isDifferent && currentLayerARN) {
-      this.log(`Not has changed! Using same layer arn: ${currentLayerARN}`);
-      this.relateLayerWithFunctions(currentLayerARN);
-      return;
-    }
-
-    await this.installDependencies();
-    await this.uploadPackageJson();
-    await this.createPackageLayer();
-    await this.uploadPackageLayer();
-    const version = await this.publishLayerVersion();
-
-    this.relateLayerWithFunctions(version.LayerVersionArn);
   }
 
   isDiff(depsA, depsB) {
@@ -301,32 +180,6 @@ class ServerlessLayers {
     return Object.keys(this.localPackage.dependencies).map(x => (
       `${x}@${this.localPackage.dependencies[x]}`
     ));
-  }
-
-  async installDependencies() {
-    this.log('Dependencies has changed! Re-installing...');
-
-    const initialCwd = process.cwd();
-    const nodeJsDir = path.join(process.cwd(), this.settings.compileDir, 'layers', 'nodejs');
-
-    await mkdirp.sync(nodeJsDir);
-
-    return new Promise((resolve) => {
-      copyFile(this.settings.packagePath, path.join(nodeJsDir, 'package.json'), (copyErr) => {
-        if (copyErr) throw copyErr;
-
-        // install deps
-        process.chdir(nodeJsDir);
-
-        const opts = { saveDev: false, cache: true, silent: false };
-
-        install(this.getDependenciesList(), opts, (installErr) => {
-          process.chdir(initialCwd);
-          if (installErr) throw installErr;
-          resolve();
-        });
-      });
-    });
   }
 
   async finalizeDeploy() {
