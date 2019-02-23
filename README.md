@@ -25,10 +25,6 @@
 
 Add the plugin to your `serverless.yml` file:
 
-## ATENTION!
-
-This plugin requires specify `deploymentBucket`!
-
 ## Serverless configuration
 ```yaml
 provider:
@@ -50,8 +46,10 @@ plugins:
 ```yaml
 custom:
   serverless-layers:
-    packagePath: './myfolder/package.json'
-    layersDeploymentBucket: "your_layers_bucket" # if not specified will get root deploymentBucket
+    compileDir: '.serverless',
+    packagePath: 'package.json',
+    compatibleRuntimes: ['nodejs'],
+    layersDeploymentBucket: "your_layers_bucket"
 ```
 
 ## Contributing

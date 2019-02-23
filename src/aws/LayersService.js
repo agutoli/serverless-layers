@@ -8,8 +8,8 @@ class LayersService extends AbstractService {
         S3Key: this.zipFileKeyName
       },
       LayerName: this.stackName,
-      Description: 'created by serverless-layers',
-      CompatibleRuntimes: ['nodejs']
+      Description: 'created by serverless-layers plugin',
+      CompatibleRuntimes: this.plugin.settings.compatibleRuntimes
     };
 
     return this.provider.request('Lambda', 'publishLayerVersion', params)

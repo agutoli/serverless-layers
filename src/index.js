@@ -17,7 +17,6 @@ class ServerlessLayers {
     this.service = serverless.service;
     this.options.region = this.provider.getRegion();
 
-
     // bindings
     this.log = this.log.bind(this);
     this.main = this.main.bind(this);
@@ -62,6 +61,7 @@ class ServerlessLayers {
     const defaultSettings = {
       compileDir: '.serverless',
       packagePath: 'package.json',
+      compatibleRuntimes: ['nodejs'],
       layersDeploymentBucket: this.service.provider.deploymentBucket
     };
     return Object.assign({}, defaultSettings, inboundSettings);
@@ -100,7 +100,7 @@ class ServerlessLayers {
   getBucketName() {
     if (!this.settings.layersDeploymentBucket) {
       throw new Error(
-        'Please, you should specify "deploymentBucket" for this plugin!\n'
+        'Please, you should specify "deploymentBucket" or "layersDeploymentBucket" option for this plugin!\n'
       );
     }
     return this.settings.layersDeploymentBucket;
