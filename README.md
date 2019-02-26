@@ -10,6 +10,7 @@
 * If package.json was not changed, it does not publish a new layer
 * Reduces drastically lambda size
 * It reduces deployment time.
+* Share same layers (libraries) with all lambda functions
 
 ## Requirements
 
