@@ -112,8 +112,14 @@ class ServerlessLayers {
 
   getBucketLayersPath() {
     const serviceStage = `${this.serverless.service.service}/${this.options.stage}`;
+
+    let deploymentPrefix = 'serverless';
+    if (this.provider.getDeploymentPrefix) {
+      deploymentPrefix = this.provider.getDeploymentPrefix();
+    }
+
     return path.join(
-      this.provider.getDeploymentPrefix(),
+      deploymentPrefix,
       serviceStage,
       'layers'
     );
@@ -177,7 +183,7 @@ class ServerlessLayers {
   }
 
   getDependenciesList() {
-    return Object.keys(this.localPackage.dependencies).map(x => (
+    return Object.keys((this.localPackage.dependencies|[])).map(x => (
       `${x}@${this.localPackage.dependencies[x]}`
     ));
   }
