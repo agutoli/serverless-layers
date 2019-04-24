@@ -190,7 +190,7 @@ class ServerlessLayers {
   }
 
   getDependenciesList() {
-    return Object.keys((this.localPackage.dependencies|[])).map(x => (
+    return Object.keys((this.localPackage.dependencies||[])).map(x => (
       `${x}@${this.localPackage.dependencies[x]}`
     ));
   }
