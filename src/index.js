@@ -49,7 +49,7 @@ class ServerlessLayers {
     this.cloudFormationService = new CloudFormationService(this);
 
     const localpackageJson = path.join(
-      process.env.PWD,
+      process.cwd(),
       this.settings.packagePath
     );
 
