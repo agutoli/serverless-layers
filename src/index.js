@@ -66,6 +66,7 @@ class ServerlessLayers {
       'serverless-layers'
     ];
     const defaultSettings = {
+      packageManager: 'npm',
       compileDir: '.serverless',
       packagePath: 'package.json',
       compatibleRuntimes: ['nodejs'],
@@ -84,7 +85,6 @@ class ServerlessLayers {
     }
 
     const currentLayerARN = await this.getLayerArn();
-
     if (!isDifferent && currentLayerARN) {
       this.log(`Not has changed! Using same layer arn: ${currentLayerARN}`);
       this.relateLayerWithFunctions(currentLayerARN);

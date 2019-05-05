@@ -47,6 +47,7 @@ plugins:
 ```yaml
 custom:
   serverless-layers:
+    packageManager: yarn, # NEW
     compileDir: '.serverless',
     packagePath: 'package.json',
     compatibleRuntimes: ['nodejs'],
