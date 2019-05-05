@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
 const exec = require('child_process').execSync;
-const copyFile = require('fs-copy-file'); // v6.10.3 support
+const copyFile = require('fs-copy-file'); // node v6.10.3 support
 
 const AbstractService = require('../AbstractService');
 
