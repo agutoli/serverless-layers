@@ -10,8 +10,8 @@ const AbstractService = require('../AbstractService');
 class Dependencies extends AbstractService {
   init() {
     this.commands = {
-      npm: 'npm install',
-      yarn: 'yarn'
+      npm: 'npm install --production',
+      yarn: 'yarn --production'
     };
     this.initialCwd = process.cwd();
     this.nodeJsDir = path.join(process.cwd(), this.plugin.settings.compileDir, 'layers', 'nodejs');
