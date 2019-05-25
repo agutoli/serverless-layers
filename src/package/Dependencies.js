@@ -1,11 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
-const exec = require('child_process').execSync;
+const { execSync } = require('child_process');
 const copyFile = require('fs-copy-file'); // node v6.10.3 support
 
 const AbstractService = require('../AbstractService');
-
 
 class Dependencies extends AbstractService {
   init() {
@@ -13,12 +12,14 @@ class Dependencies extends AbstractService {
       npm: 'npm install --production',
       yarn: 'yarn --production'
     };
-    this.initialCwd = process.cwd();
     this.nodeJsDir = path.join(process.cwd(), this.plugin.settings.compileDir, 'layers', 'nodejs');
   }
 
-  run(cmd, options = []) {
-    console.log(exec(cmd, options).toString());
+  run(cmd) {
+    console.log(execSync(cmd, {
+      cwd: this.nodeJsDir,
+      env: process.env
+    }).toString());
   }
 
   copyProjectFile(filename) {
@@ -52,12 +53,13 @@ class Dependencies extends AbstractService {
       await this.copyProjectFile('yarn.lock');
     }
 
-    process.chdir(this.nodeJsDir);
+    // custom commands
+    if (this.plugin.settings.customInstallationCommand) {
+      return this.run(this.plugin.settings.customInstallationCommand);
+    }
 
     // packages installation
-    this.run(this.commands[this.plugin.settings.packageManager]);
-
-    process.chdir(this.initialCwd);
+    return this.run(this.commands[this.plugin.settings.packageManager]);
   }
 }
 

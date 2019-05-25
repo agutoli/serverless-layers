@@ -70,6 +70,7 @@ class ServerlessLayers {
       compileDir: '.serverless',
       packagePath: 'package.json',
       compatibleRuntimes: ['nodejs'],
+      customInstallationCommand: null,
       layersDeploymentBucket: this.service.provider.deploymentBucket
     };
     return Object.assign({}, defaultSettings, inboundSettings);
