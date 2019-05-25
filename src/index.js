@@ -130,7 +130,7 @@ class ServerlessLayers {
       deploymentPrefix,
       serviceStage,
       'layers'
-    );
+    ).replace(/\\/g, '/');
   }
 
   async getLayerArn() {
