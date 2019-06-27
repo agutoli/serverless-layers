@@ -1,35 +1,65 @@
+const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
-const install = require('npm-install-package');
-const copyFile = require('fs-copy-file'); // v6.10.3 support
+const { execSync } = require('child_process');
+const copyFile = require('fs-copy-file'); // node v6.10.3 support
 
 const AbstractService = require('../AbstractService');
 
 class Dependencies extends AbstractService {
-  async install() {
-    this.plugin.log('Dependencies has changed! Re-installing...');
+  init() {
+    this.commands = {
+      npm: 'npm install --production',
+      yarn: 'yarn --production'
+    };
+    this.nodeJsDir = path.join(process.cwd(), this.plugin.settings.compileDir, 'layers', 'nodejs');
+  }
 
-    const initialCwd = process.cwd();
-    const nodeJsDir = path.join(process.cwd(), this.plugin.settings.compileDir, 'layers', 'nodejs');
+  run(cmd) {
+    console.log(execSync(cmd, {
+      cwd: this.nodeJsDir,
+      env: process.env
+    }).toString());
+  }
 
-    await mkdirp.sync(nodeJsDir);
+  copyProjectFile(filename) {
+    this.init();
+
+    if (!fs.existsSync(filename)) {
+      this.plugin.log(`[warning] "${filename}" file does not exists!`);
+      return true;
+    }
 
     return new Promise((resolve) => {
-      copyFile(this.plugin.settings.packagePath, path.join(nodeJsDir, 'package.json'), (copyErr) => {
+      copyFile(filename, path.join(this.nodeJsDir, filename), (copyErr) => {
         if (copyErr) throw copyErr;
-
-        // install deps
-        process.chdir(nodeJsDir);
-
-        const opts = { saveDev: false, cache: true, silent: false };
-
-        install(this.plugin.getDependenciesList(), opts, (installErr) => {
-          process.chdir(initialCwd);
-          if (installErr) throw installErr;
-          resolve();
-        });
+        return resolve();
       });
     });
+  }
+
+  async install() {
+    this.init();
+    this.plugin.log('Dependencies has changed! Re-installing...');
+
+    await mkdirp.sync(this.nodeJsDir);
+    await this.copyProjectFile(this.plugin.settings.packagePath);
+
+    if (this.plugin.settings.packageManager === 'npm') {
+      await this.copyProjectFile('package-lock.json');
+    }
+
+    if (this.plugin.settings.packageManager === 'yarn') {
+      await this.copyProjectFile('yarn.lock');
+    }
+
+    // custom commands
+    if (this.plugin.settings.customInstallationCommand) {
+      return this.run(this.plugin.settings.customInstallationCommand);
+    }
+
+    // packages installation
+    return this.run(this.commands[this.plugin.settings.packageManager]);
   }
 }
 

@@ -51,10 +51,12 @@ plugins:
 ```yaml
 custom:
   serverless-layers:
-    compileDir: '.serverless',
-    packagePath: 'package.json',
-    compatibleRuntimes: ['nodejs'],
+    packageManager: yarn # NEW
+    compileDir: .serverless
+    packagePath: package.json
+    compatibleRuntimes: ['nodejs']
     layersDeploymentBucket: "your_layers_bucket"
+    customInstallationCommand: 'MY_ENV=foo npm --proxy https://myproxy.com install --production'
 ```
 
 ## Contributing

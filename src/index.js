@@ -13,21 +13,6 @@ class ServerlessLayers {
     this.options = options;
     this.serverless = serverless;
 
-    this.provider = serverless.getProvider('aws');
-    this.service = serverless.service;
-    this.options.region = this.provider.getRegion();
-
-    // bindings
-    this.log = this.log.bind(this);
-    this.main = this.main.bind(this);
-
-    const version = serverless.getVersion().replace(/\./g, '');
-
-    if (version < 1340) {
-      this.log(`Error: Please install serverless >= 1.34.0 (current ${serverless.getVersion()})`)
-      process.exit(1);
-    }
-
     // hooks
     this.hooks = {
       'before:package:initialize': () => BbPromise.bind(this)
@@ -40,6 +25,21 @@ class ServerlessLayers {
   }
 
   async init() {
+    this.provider = this.serverless.getProvider('aws');
+    this.service = this.serverless.service;
+    this.options.region = this.provider.getRegion();
+
+    // bindings
+    this.log = this.log.bind(this);
+    this.main = this.main.bind(this);
+
+    const version = this.serverless.getVersion().replace(/\./g, '');
+
+    if (version < 1340) {
+      this.log(`Error: Please install serverless >= 1.34.0 (current ${serverless.getVersion()})`)
+      process.exit(1);
+    }
+
     this.settings = this.getSettings();
 
     this.zipService = new ZipService(this);
@@ -66,9 +66,11 @@ class ServerlessLayers {
       'serverless-layers'
     ];
     const defaultSettings = {
+      packageManager: 'npm',
       compileDir: '.serverless',
       packagePath: 'package.json',
       compatibleRuntimes: ['nodejs'],
+      customInstallationCommand: null,
       layersDeploymentBucket: this.service.provider.deploymentBucket
     };
     return Object.assign({}, defaultSettings, inboundSettings);
@@ -84,7 +86,6 @@ class ServerlessLayers {
     }
 
     const currentLayerARN = await this.getLayerArn();
-
     if (!isDifferent && currentLayerARN) {
       this.log(`Not has changed! Using same layer arn: ${currentLayerARN}`);
       this.relateLayerWithFunctions(currentLayerARN);
@@ -129,7 +130,7 @@ class ServerlessLayers {
       deploymentPrefix,
       serviceStage,
       'layers'
-    );
+    ).replace(/\\/g, '/');
   }
 
   async getLayerArn() {

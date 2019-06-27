@@ -1,0 +1,6 @@
+.travis.yml
+.eslintrc
+.editorconfig
+.babelrc
+bin/*
+src/*
