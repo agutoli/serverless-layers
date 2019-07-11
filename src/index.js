@@ -12,6 +12,7 @@ class ServerlessLayers {
     this.cacheObject = {};
     this.options = options;
     this.serverless = serverless;
+    this.initialized = false;
 
     // hooks
     this.hooks = {
@@ -20,11 +21,16 @@ class ServerlessLayers {
       'package:initialize': () => BbPromise.bind(this)
         .then(() => this.main()),
       'aws:info:displayLayers': () => BbPromise.bind(this)
+        .then(() => this.init())
         .then(() => this.finalizeDeploy())
     };
   }
 
   async init() {
+    if (this.initialized) {
+      return;
+    }
+    
     this.provider = this.serverless.getProvider('aws');
     this.service = this.serverless.service;
     this.options.region = this.provider.getRegion();
@@ -59,6 +65,8 @@ class ServerlessLayers {
       this.log(`Error: Can not find ${localpackageJson}!`);
       process.exit(1);
     }
+
+    this.initialized = true;
   }
 
   getSettings() {
