@@ -53,6 +53,40 @@ custom:
     customInstallationCommand: 'MY_ENV=foo npm --proxy https://myproxy.com install --production'
 ```
 
+## Mininal Policy permissions for CI/CD IAM users
+
+`serverless-layers-policy.json`
+```json
+{
+   "Version":"2012-10-17",
+   "Statement":[
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:PutObject",
+            "s3:GetObject"
+         ],
+         "Resource": "arn:aws:s3:::examplebucket"
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "cloudformation:DescribeStacks"
+         ],
+         "Resource": "*"
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "lambda:PublishLayerVersion"
+         ],
+         "Resource": "*"
+      }
+   ]
+}
+```
+
+
 ## Contributing
 
 Yes, thank you!
