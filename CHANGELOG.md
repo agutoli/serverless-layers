@@ -1,3 +1,6 @@
+# 1.4.0 (2019-07-28)
+- Added support for default package options (exclude and individually)
+
 # 1.3.1 (2019-05-25)
 - [Created customInstallationCommand](https://github.com/agutoli/serverless-layers)
 
