@@ -37,7 +37,6 @@ package:
   individually: false
   exclude:
     - node_modules/**
-  excludeDevDependencies: true
 
 plugins:
   - serverless-layers
