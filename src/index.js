@@ -81,7 +81,7 @@ class ServerlessLayers {
       customInstallationCommand: null,
       layersDeploymentBucket: this.service.provider.deploymentBucket
     };
-    return Object.assign({}, defaultSettings, inboundSettings);
+    return {...defaultSettings, ...inboundSettings};
   }
 
   async main() {
