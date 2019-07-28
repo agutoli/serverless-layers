@@ -30,7 +30,7 @@ class ServerlessLayers {
     if (this.initialized) {
       return;
     }
-    
+
     this.provider = this.serverless.getProvider('aws');
     this.service = this.serverless.service;
     this.options.region = this.provider.getRegion();
@@ -93,6 +93,9 @@ class ServerlessLayers {
       isDifferent = await this.isDiff(remotePackage.dependencies, this.localPackage.dependencies);
     }
 
+    // merge package default options
+    this.mergePackageOptions();
+
     const currentLayerARN = await this.getLayerArn();
     if (!isDifferent && currentLayerARN) {
       this.log(`Not has changed! Using same layer arn: ${currentLayerARN}`);
@@ -153,6 +156,23 @@ class ServerlessLayers {
 
   getOutputLogicalId() {
     return this.provider.naming.getLambdaLayerOutputLogicalId(this.getStackName());
+  }
+
+  mergePackageOptions() {
+    const pkg = this.service.package;
+
+    const opts = {
+      individually: false,
+      exclude: []
+    };
+
+    this.service.package = {...opts, ...pkg};
+
+    const hasRule = this.service.package.exclude.indexOf('node_modules/**');
+
+    if (hasRule === -1) {
+      this.service.package.exclude.push('node_modules/**');
+    }
   }
 
   relateLayerWithFunctions(layerArn) {

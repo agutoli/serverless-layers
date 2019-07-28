@@ -30,17 +30,12 @@ or
 
 Add the plugin to your `serverless.yml` file:
 
-## Serverless configuration
+## Simple usage
 ```yaml
 provider:
   ...
   deploymentBucket: #required!
-    name: "your_bucket"
-
-package:
-  individually: false
-  exclude:
-    - node_modules/**
+    name: 'your_bucket'
 
 plugins:
   - serverless-layers
@@ -54,7 +49,7 @@ custom:
     compileDir: .serverless
     packagePath: package.json
     compatibleRuntimes: ['nodejs']
-    layersDeploymentBucket: "your_layers_bucket"
+    layersDeploymentBucket: your_layers_bucket
     customInstallationCommand: 'MY_ENV=foo npm --proxy https://myproxy.com install --production'
 ```
 
