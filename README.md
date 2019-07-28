@@ -24,6 +24,10 @@
 
 `npm install -D serverless-layers`
 
+or
+
+`serverless plugin install --name serverless-layers`
+
 Add the plugin to your `serverless.yml` file:
 
 ## Serverless configuration
