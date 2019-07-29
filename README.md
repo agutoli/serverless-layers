@@ -53,7 +53,7 @@ custom:
     customInstallationCommand: 'MY_ENV=foo npm --proxy https://myproxy.com install --production'
 ```
 
-## Mininal Policy permissions for CI/CD IAM users
+## Minimal Policy permissions for CI/CD IAM users
 
 `serverless-layers-policy.json`
 ```json
