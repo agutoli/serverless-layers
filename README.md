@@ -34,7 +34,7 @@ Add the plugin to your `serverless.yml` file:
 ```yaml
 provider:
   ...
-  deploymentBucket: #required!
+  deploymentBucket: # OR `layersDeploymentBucket` is required
     name: 'your_bucket'
 
 plugins:
@@ -45,7 +45,7 @@ plugins:
 ```yaml
 custom:
   serverless-layers:
-    packageManager: yarn # NEW
+    packageManager: yarn # OR `npm`
     compileDir: .serverless
     packagePath: package.json
     compatibleRuntimes: ['nodejs']
