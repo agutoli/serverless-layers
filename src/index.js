@@ -163,6 +163,7 @@ class ServerlessLayers {
 
     const opts = {
       individually: false,
+      excludeDevDependencies: false,
       exclude: []
     };
 
