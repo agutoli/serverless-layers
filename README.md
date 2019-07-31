@@ -59,6 +59,15 @@ custom:
 | layersDeploymentBucket | `string` |  | You can specify a bucket to upload lambda layers. `Required if deploymentBucket is not defined.` |
 | customInstallationCommand | `string` |  | It specify a custom command to install deps ex. `MY_ENV=1 npm --proxy http://myproxy.com i -P` |
 
+## Default Serverless Setup
+
+This plugin will setup follow options automatically if not specified at `serverless.yml`.
+
+|     Option     |    Type   |   Default   |
+| -------------- | --------- | ----------- |
+| package.individually | `bool` | false    |
+| package.exclude | `array` | `['node_modules/**']` |
+| package.excludeDevDependencies | `bool` | false |
 
 ## Mininal Policy permissions for CI/CD IAM users
 
