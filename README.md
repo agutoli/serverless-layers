@@ -34,26 +34,33 @@ Add the plugin to your `serverless.yml` file:
 ```yaml
 provider:
   ...
-  deploymentBucket: #required!
+  deploymentBucket:
     name: 'your_bucket'
 
 plugins:
   - serverless-layers
 ```
 
-## Options
+## Plugin Options
+Example:
+
 ```yaml
 custom:
   serverless-layers:
-    packageManager: yarn # NEW
-    compileDir: .serverless
-    packagePath: package.json
-    compatibleRuntimes: ['nodejs']
-    layersDeploymentBucket: your_layers_bucket
-    customInstallationCommand: 'MY_ENV=foo npm --proxy https://myproxy.com install --production'
+    packageManager: npm
 ```
 
-## Minimal Policy permissions for CI/CD IAM users
+|     Option     |    Type   |   Default   | Description |
+| -------------- | --------- | ----------- | ----------- |
+| packageManager |  `string` |    npm      | Possible values: npm, yarn |
+| compileDir     |  `string` | .serverless | Compilation directory |
+| packagePath    |  `string` | package.json | You can specify custom path for you package.json |
+| compatibleRuntimes |  `array` | `['nodejs']` | Possible values: nodejs, nodejs8.10, nodejs10.x |
+| layersDeploymentBucket | `string` |  | You can specify a bucket to upload lambda layers. `Required if deploymentBucket is not defined.` |
+| customInstallationCommand | `string` |  | It specify a custom command to install deps ex. `MY_ENV=1 npm --proxy http://myproxy.com i -P` |
+
+
+## Mininal Policy permissions for CI/CD IAM users
 
 `serverless-layers-policy.json`
 ```json
