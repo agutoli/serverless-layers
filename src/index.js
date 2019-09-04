@@ -113,7 +113,7 @@ class ServerlessLayers {
   }
 
   getStackName() {
-    return `${this.serverless.service.service}-${this.options.stage}`;
+    return this.provider.naming.getStackName();
   }
 
   getBucketName() {
