@@ -1,3 +1,6 @@
+# 1.4.2 (2019-08-04)
+- [PR with code improvements over getStackName function](https://github.com/agutoli/serverless-layers/pull/19)
+
 # 1.4.0 (2019-07-28)
 - Added support for default package options (exclude and individually)
 
