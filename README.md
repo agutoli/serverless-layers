@@ -54,7 +54,7 @@ custom:
 | -------------- | --------- | ----------- | ----------- |
 | packageManager |  `string` |    npm      | Possible values: npm, yarn |
 | compileDir     |  `string` | .serverless | Compilation directory |
-| packagePath    |  `string` | package.json | You can specify custom path for you package.json |
+| packagePath    |  `string` | package.json | You can specify custom path for your package.json |
 | compatibleRuntimes |  `array` | `['nodejs']` | Possible values: nodejs, nodejs8.10, nodejs10.x |
 | layersDeploymentBucket | `string` |  | You can specify a bucket to upload lambda layers. `Required if deploymentBucket is not defined.` |
 | customInstallationCommand | `string` |  | It specify a custom command to install deps ex. `MY_ENV=1 npm --proxy http://myproxy.com i -P` |
