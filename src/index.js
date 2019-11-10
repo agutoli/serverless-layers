@@ -42,7 +42,7 @@ class ServerlessLayers {
     const version = this.serverless.getVersion().replace(/\./g, '');
 
     if (version < 1340) {
-      this.log(`Error: Please install serverless >= 1.34.0 (current ${serverless.getVersion()})`)
+      this.log(`Error: Please install serverless >= 1.34.0 (current ${this.serverless.getVersion()})`)
       process.exit(1);
     }
 
@@ -169,7 +169,7 @@ class ServerlessLayers {
 
     this.service.package = {...opts, ...pkg};
 
-    const hasRule = this.service.package.exclude.indexOf('node_modules/**');
+    const hasRule = (this.service.package.exclude || '').indexOf('node_modules/**');
 
     if (hasRule === -1) {
       this.service.package.exclude.push('node_modules/**');
