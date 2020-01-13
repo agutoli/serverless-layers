@@ -88,6 +88,7 @@ class ServerlessLayers {
     const remotePackage = await this.bucketService.downloadPackageJson();
 
     let isDifferent = true;
+
     if (remotePackage) {
       this.log('Comparing package.json dependencies...');
       isDifferent = await this.isDiff(remotePackage.dependencies, this.localPackage.dependencies);
@@ -203,6 +204,10 @@ class ServerlessLayers {
   }
 
   isDiff(depsA, depsB) {
+    if (!depsA) {
+      return true;
+    }
+
     const depsKeyA = Object.keys(depsA);
     const depsKeyB = Object.keys(depsB);
     const isSizeEqual = depsKeyA.length === depsKeyB.length;
