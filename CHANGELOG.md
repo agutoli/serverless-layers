@@ -1,3 +1,6 @@
+# 1.5.0 (2020-02-05)
+- [Added feature to clean up layers when remove stack](https://github.com/agutoli/serverless-layers/pull/23)
+
 # 1.4.2 (2019-08-04)
 - [PR with code improvements over getStackName function](https://github.com/agutoli/serverless-layers/pull/19)
 
