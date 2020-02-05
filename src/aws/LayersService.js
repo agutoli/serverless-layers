@@ -23,6 +23,31 @@ class LayersService extends AbstractService {
         process.exit(1);
       });
   }
+
+  async cleanUpLayers() {
+    const params = {
+      LayerName: this.stackName
+    };
+
+    const response = await this.provider.request('Lambda', 'listLayerVersions', params);
+
+    if (response.LayerVersions.length === 0) {
+      this.plugin.log('Layers removal finished.');
+      return;
+    }
+
+    const deleteQueue = response.LayerVersions.map((layerVersion) => {
+      this.plugin.log(`Removing layer version: ${layerVersion.Version}`);
+      return this.provider.request('Lambda', 'deleteLayerVersion', {
+        LayerName: this.stackName,
+        VersionNumber: layerVersion.Version
+      });
+    });
+
+    await Promise.all(deleteQueue);
+
+    await this.cleanUpLayers();
+  }
 }
 
 module.exports = LayersService;

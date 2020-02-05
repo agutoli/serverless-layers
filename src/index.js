@@ -22,7 +22,13 @@ class ServerlessLayers {
         .then(() => this.main()),
       'aws:info:displayLayers': () => BbPromise.bind(this)
         .then(() => this.init())
-        .then(() => this.finalizeDeploy())
+        .then(() => this.finalizeDeploy()),
+      'plugin:uninstall:uninstall': () => BbPromise.bind(this)
+        .then(() => this.init())
+        .then(() => this.cleanUpLayers()),
+      'remove:remove': () => BbPromise.bind(this)
+        .then(() => this.init())
+        .then(() => this.cleanUpLayers()),
     };
   }
 
@@ -104,7 +110,7 @@ class ServerlessLayers {
       return;
     }
 
-    await this.dependencies.install()
+    await this.dependencies.install();
     await this.zipService.package();
     await this.bucketService.uploadZipFile();
     const version = await this.layersService.publishVersion();
@@ -239,6 +245,10 @@ class ServerlessLayers {
 
   log(msg) {
     this.serverless.cli.log(`[LayersPlugin]: ${msg}`);
+  }
+
+  cleanUpLayers() {
+    return this.layersService.cleanUpLayers();
   }
 }
 
