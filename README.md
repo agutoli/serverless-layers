@@ -77,7 +77,7 @@ custom:
 |     Option     |    Type   |   Default   | Description |
 | -------------- | --------- | ----------- | ----------- |
 | packageManager |  `string` |    pip      | Possible values: pip |
-| dependenciesPath   |  `string` | package.json | Note: Available for `>= 2.x` versions. You can specify custom path for your requirements.txt |
+| dependenciesPath   |  `string` | requirements.txt | Note: Available for `>= 2.x` versions. You can specify custom path for your requirements.txt |
 | compatibleRuntimes |  `array` | `['python']` | Possible values: python2.7, python3.6, python3.7 and python3.8 |
 
 ## Default Serverless Setup
