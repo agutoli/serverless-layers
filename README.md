@@ -6,19 +6,24 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
 * Automatically attach layers for each lambda function
-* Creates a new layer version when `package.json` was updated
-* If package.json was not changed, it does not publish a new layer
+* Creates a new layer version when `depenedencies` was updated
+* If `dependencie` was not changed, it does not publish a new layer
 * Reduces drastically lambda size
 * It reduces deployment time.
 * Share same layers (libraries) with all lambda functions
 
-## Requirements
-
+## common requirements
+* AWS only (sorry)
 * Serverless >= 1.34.0 (layers support)
+
+## Requirements NodeJS
 * Node >= v6.10.3
 * NPM >= 3.10.10
-* AWS only (sorry)
-* A valid package.json, requirements.txt file
+* A valid package.json file
+
+## Requirements Python
+* Python >= 2.7
+* A valid requirements.txt file
 
 ## Install
 
@@ -41,7 +46,7 @@ plugins:
   - serverless-layers
 ```
 
-## Plugin Options
+## Plugin Common Options
 Example:
 
 ```yaml
@@ -52,13 +57,28 @@ custom:
 
 |     Option     |    Type   |   Default   | Description |
 | -------------- | --------- | ----------- | ----------- |
-| packageManager |  `string` |    npm      | Possible values: npm, yarn |
 | compileDir     |  `string` | .serverless | Compilation directory |
-| packagePath    |  `string` | package.json | `(DEPRECATED)`: Available for `<= 1.5.0`, for versions `>= 2.x` please use `compatibleRuntimes` |
-| dependenciesPath   |  `string` | package.json | Note: `>= 2.x` versions. You can specify custom path for your package.json |
-| compatibleRuntimes |  `array` | `['nodejs']` | Possible values: python2.7, python3.x, nodejs, nodejs8.10, nodejs10.x |
 | layersDeploymentBucket | `string` |  | You can specify a bucket to upload lambda layers. `Required if deploymentBucket is not defined.` |
 | customInstallationCommand | `string` |  | It specify a custom command to install deps ex. `MY_ENV=1 npm --proxy http://myproxy.com i -P` |
+
+
+## Plugin Options NodeJS
+
+|     Option     |    Type   |   Default   | Description |
+| -------------- | --------- | ----------- | ----------- |
+| packageManager |  `string` |    npm      | Possible values: npm, yarn |
+| packagePath    |  `string` | package.json | `(DEPRECATED)`: Available for `<= 1.5.0`, for versions `>= 2.x` please use `compatibleRuntimes` |
+| dependenciesPath   |  `string` | package.json | Note: `>= 2.x` versions. You can specify custom path for your package.json |
+| compatibleRuntimes |  `array` | `['nodejs']` | Possible values: nodejs, nodejs10.x, nodejs12.x |
+
+
+## Plugin Options Python
+
+|     Option     |    Type   |   Default   | Description |
+| -------------- | --------- | ----------- | ----------- |
+| packageManager |  `string` |    pip      | Possible values: pip |
+| dependenciesPath   |  `string` | package.json | Note: Available for `>= 2.x` versions. You can specify custom path for your requirements.txt |
+| compatibleRuntimes |  `array` | `['python']` | Possible values: python2.7, python3.6, python3.7 and python3.8 |
 
 ## Default Serverless Setup
 
