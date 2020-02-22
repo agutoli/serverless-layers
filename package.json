@@ -1,6 +1,6 @@
 {
   "name": "serverless-layers",
-  "version": "2.0.0-alpha",
+  "version": "2.0.1-alpha",
   "description": "",
   "main": "lib/index.js",
   "bugs": {
@@ -23,6 +23,9 @@
     "Amazon Web Services",
     "AWS",
     "Lambda",
+    "python",
+    "nodejs",
+    "plugin",
     "API Gateway",
     "environment",
     "layers"
