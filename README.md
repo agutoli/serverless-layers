@@ -12,7 +12,7 @@
 * It reduces deployment time.
 * Share same layers (libraries) with all lambda functions
 
-## common requirements
+## Common requirements
 * AWS only (sorry)
 * Serverless >= 1.34.0 (layers support)
 
