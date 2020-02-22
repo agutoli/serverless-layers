@@ -7,7 +7,7 @@ class LayersService extends AbstractService {
         S3Bucket: this.bucketName,
         S3Key: this.zipFileKeyName
       },
-      LayerName: this.stackName,
+      LayerName: this.layerName,
       Description: 'created by serverless-layers plugin',
       CompatibleRuntimes: this.plugin.settings.compatibleRuntimes
     };
@@ -26,7 +26,7 @@ class LayersService extends AbstractService {
 
   async cleanUpLayers() {
     const params = {
-      LayerName: this.stackName
+      LayerName: this.layerName
     };
 
     const response = await this.provider.request('Lambda', 'listLayerVersions', params);
@@ -39,7 +39,7 @@ class LayersService extends AbstractService {
     const deleteQueue = response.LayerVersions.map((layerVersion) => {
       this.plugin.log(`Removing layer version: ${layerVersion.Version}`);
       return this.provider.request('Lambda', 'deleteLayerVersion', {
-        LayerName: this.stackName,
+        LayerName: this.layerName,
         VersionNumber: layerVersion.Version
       });
     });

@@ -22,13 +22,15 @@ class UploadService extends AbstractService {
       });
   }
 
-  async uploadPackageJson() {
-    this.plugin.log('Uploading remote package.json...');
+  async uploadDependencesFile() {
+    const { dependenciesPath } = this.plugin.settings;
+
+    this.plugin.log(`Uploading remote ${dependenciesPath}...`);
 
     const params = {
       Bucket: this.bucketName,
-      Key: this.packageJsonKeyName,
-      Body: fs.createReadStream(this.plugin.settings.packagePath)
+      Key: this.dependenceFilename,
+      Body: fs.createReadStream(this.plugin.settings.dependenciesPath)
     };
 
     return this.provider.request('S3', 'putObject', params)
@@ -42,18 +44,19 @@ class UploadService extends AbstractService {
       });
   }
 
-  async downloadPackageJson() {
-    this.plugin.log('Downloading package.json from bucket...');
+  async downloadDependencesFile() {
+    const { dependenciesPath } = this.plugin.settings;
 
+    this.plugin.log(`Downloading ${dependenciesPath} from bucket...`);
     const params = {
       Bucket: this.bucketName,
-      Key: this.packageJsonKeyName
+      Key: this.dependenceFilename
     };
 
     return this.provider.request('S3', 'getObject', params)
-      .then((result) => JSON.parse(result.Body.toString()))
+      .then((result) => result.Body.toString())
       .catch(() => {
-        this.plugin.log('package.json does not exists at bucket...');
+        this.plugin.log(`${dependenciesPath} does not exists at bucket...`);
         return null;
       });
   }

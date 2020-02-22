@@ -8,16 +8,13 @@ const AbstractService = require('../AbstractService');
 
 class Dependencies extends AbstractService {
   init() {
-    this.commands = {
-      npm: 'npm install --production',
-      yarn: 'yarn --production'
-    };
-    this.nodeJsDir = path.join(process.cwd(), this.plugin.settings.compileDir, 'layers', 'nodejs');
+    const { runtimeDir } = this.plugin.settings;
+    this.layersPackageDir = path.join(process.cwd(), this.plugin.settings.compileDir, 'layers', runtimeDir);
   }
 
   run(cmd) {
     console.log(execSync(cmd, {
-      cwd: this.nodeJsDir,
+      cwd: this.layersPackageDir,
       env: process.env
     }).toString());
   }
@@ -31,7 +28,7 @@ class Dependencies extends AbstractService {
     }
 
     return new Promise((resolve) => {
-      copyFile(filename, path.join(this.nodeJsDir, filename), (copyErr) => {
+      copyFile(filename, path.join(this.layersPackageDir, filename), (copyErr) => {
         if (copyErr) throw copyErr;
         return resolve();
       });
@@ -39,18 +36,19 @@ class Dependencies extends AbstractService {
   }
 
   async install() {
+    const { copyBeforeInstall } = this.plugin.settings;
+
     this.init();
     this.plugin.log('Dependencies has changed! Re-installing...');
 
-    await mkdirp.sync(this.nodeJsDir);
-    await this.copyProjectFile(this.plugin.settings.packagePath);
+    await mkdirp.sync(this.layersPackageDir);
+    await this.copyProjectFile(this.plugin.settings.dependenciesPath);
 
-    if (this.plugin.settings.packageManager === 'npm') {
-      await this.copyProjectFile('package-lock.json');
-    }
-
-    if (this.plugin.settings.packageManager === 'yarn') {
-      await this.copyProjectFile('yarn.lock');
+    for (const index in copyBeforeInstall) {
+      const filename = copyBeforeInstall[index];
+      if (!fs.existsSync(filename)) {
+        await this.copyProjectFile(filename);
+      }
     }
 
     // custom commands
@@ -58,8 +56,10 @@ class Dependencies extends AbstractService {
       return this.run(this.plugin.settings.customInstallationCommand);
     }
 
+    const commands = this.plugin.runtimes.getCommands();
+
     // packages installation
-    return this.run(this.commands[this.plugin.settings.packageManager]);
+    return this.run(commands[this.plugin.settings.packageManager]);
   }
 }
 

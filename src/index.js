@@ -1,6 +1,7 @@
 const BbPromise = require('bluebird');
 const path = require('path');
 
+const Runtimes = require('./runtimes');
 const LayersService = require('./aws/LayersService');
 const BucketService = require('./aws/BucketService');
 const CloudFormationService = require('./aws/CloudFormationService');
@@ -16,10 +17,10 @@ class ServerlessLayers {
 
     // hooks
     this.hooks = {
+      'before:package:function:package': () => BbPromise.bind(this)
+        .then(() => this.init().then(() =>this.main())),
       'before:package:initialize': () => BbPromise.bind(this)
-        .then(() => this.init()),
-      'package:initialize': () => BbPromise.bind(this)
-        .then(() => this.main()),
+        .then(() => this.init().then(() =>this.main())),
       'aws:info:displayLayers': () => BbPromise.bind(this)
         .then(() => this.init())
         .then(() => this.finalizeDeploy()),
@@ -52,6 +53,8 @@ class ServerlessLayers {
       process.exit(1);
     }
 
+    this.runtimes = new Runtimes(this);
+
     this.settings = this.getSettings();
 
     this.zipService = new ZipService(this);
@@ -60,18 +63,6 @@ class ServerlessLayers {
     this.bucketService = new BucketService(this);
     this.cloudFormationService = new CloudFormationService(this);
 
-    const localpackageJson = path.join(
-      process.cwd(),
-      this.settings.packagePath
-    );
-
-    try {
-      this.localPackage = require(localpackageJson);
-    } catch (e) {
-      this.log(`Error: Can not find ${localpackageJson}!`);
-      process.exit(1);
-    }
-
     this.initialized = true;
   }
 
@@ -79,42 +70,35 @@ class ServerlessLayers {
     const inboundSettings = (this.serverless.service.custom || {})[
       'serverless-layers'
     ];
-    const defaultSettings = {
-      packageManager: 'npm',
+    return {
+      ...this.runtimes.getDefaultSettings(inboundSettings),
       compileDir: '.serverless',
-      packagePath: 'package.json',
-      compatibleRuntimes: ['nodejs'],
       customInstallationCommand: null,
       layersDeploymentBucket: this.service.provider.deploymentBucket
     };
-    return {...defaultSettings, ...inboundSettings};
   }
 
   async main() {
-    const remotePackage = await this.bucketService.downloadPackageJson();
+    await this.dependencies.init();
 
-    let isDifferent = true;
-
-    if (remotePackage) {
-      this.log('Comparing package.json dependencies...');
-      isDifferent = await this.isDiff(remotePackage.dependencies, this.localPackage.dependencies);
-    }
+    const isDifferent = await this.runtimes.hasDependencesChanged();
 
     // merge package default options
     this.mergePackageOptions();
 
     const currentLayerARN = await this.getLayerArn();
     if (!isDifferent && currentLayerARN) {
-      this.log(`Not has changed! Using same layer arn: ${currentLayerARN}`);
-      this.relateLayerWithFunctions(currentLayerARN);
-      return;
+     this.log(`Not has changed! Using same layer arn: ${currentLayerARN}`);
+     this.relateLayerWithFunctions(currentLayerARN);
+     return;
     }
 
     await this.dependencies.install();
+
     await this.zipService.package();
     await this.bucketService.uploadZipFile();
     const version = await this.layersService.publishVersion();
-    await this.bucketService.uploadPackageJson();
+    await this.bucketService.uploadDependencesFile();
 
     this.relateLayerWithFunctions(version.LayerVersionArn);
   }
@@ -166,6 +150,7 @@ class ServerlessLayers {
   }
 
   mergePackageOptions() {
+    const { packageExclude } = this.settings;
     const pkg = this.service.package;
 
     const opts = {
@@ -176,10 +161,11 @@ class ServerlessLayers {
 
     this.service.package = {...opts, ...pkg};
 
-    const hasRule = (this.service.package.exclude || '').indexOf('node_modules/**');
-
-    if (hasRule === -1) {
-      this.service.package.exclude.push('node_modules/**');
+    for (const excludeFile of packageExclude) {
+      const hasRule = (this.service.package.exclude || '').indexOf(excludeFile);
+      if (hasRule === -1) {
+        this.service.package.exclude.push(excludeFile);
+      }
     }
   }
 
@@ -207,27 +193,6 @@ class ServerlessLayers {
         }
       }
     });
-  }
-
-  isDiff(depsA, depsB) {
-    if (!depsA) {
-      return true;
-    }
-
-    const depsKeyA = Object.keys(depsA);
-    const depsKeyB = Object.keys(depsB);
-    const isSizeEqual = depsKeyA.length === depsKeyB.length;
-
-    if (!isSizeEqual) return true;
-
-    let hasDifference = false;
-    Object.keys(depsA).forEach(dependence => {
-      if (depsA[dependence] !== depsB[dependence]) {
-        hasDifference = true;
-      }
-    });
-
-    return hasDifference;
   }
 
   getDependenciesList() {
