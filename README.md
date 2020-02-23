@@ -43,7 +43,7 @@ plugins:
   - serverless-layers
 ```
 
-## Plugin Common Options
+## Plugin usage
 Example:
 
 ```yaml
