@@ -13,7 +13,7 @@
 * Share same layers (libraries) with all lambda functions
 
 # Options 
-* [NodeJS](#nodejs-options)
+* [NodeJS](#nodejs)
 * [Ruby](#ruby-options)
 * [Python](#python-options)
 
@@ -21,10 +21,6 @@
 * AWS only (sorry)
 * Serverless >= 1.34.0 (layers support)
 
-## NodeJS
-* Node >= v6.10.3
-* NPM >= 3.10.10
-* A valid package.json file
 
 ## Requirements Python
 * Python >= 2.7
@@ -67,7 +63,15 @@ custom:
 | customInstallationCommand | `string` |  | It specify a custom command to install deps ex. `MY_ENV=1 npm --proxy http://myproxy.com i -P` |
 
 
-## NodeJS Options
+## NodeJS
+
+
+### Requirements
+* Node >= v6.10.3
+* NPM >= 3.10.10
+* A valid package.json file
+
+### Options
 
 |     Option     |    Type   |   Default   | Description |
 | -------------- | --------- | ----------- | ----------- |
