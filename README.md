@@ -32,21 +32,13 @@ or
 
 Add the plugin to your `serverless.yml` file:
 
-## Simple usage
-```yaml
-provider:
-  ...
-  deploymentBucket:
-    name: 'your_bucket'
-
-plugins:
-  - serverless-layers
-```
-
 ## Plugin usage
 Example:
 
 ```yaml
+plugins:
+  - serverless-layers
+  
 custom:
   serverless-layers:
     packageManager: npm
