@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-class PythonRuntime {
+
+class RubyRuntime {
   constructor(parent, runtime, runtimeDir) {
     this.parent = parent;
     this.plugin = parent.plugin;
@@ -9,19 +10,26 @@ class PythonRuntime {
     this.default = {
       runtime,
       runtimeDir,
-      packageManager:  'pip',
-      dependenciesPath: 'requirements.txt',
+      packageManager:  'bundle',
+      dependenciesPath: 'Gemfile',
       compatibleRuntimes: [runtime],
-      copyBeforeInstall: [],
+      copyBeforeInstall: [
+        'Gemfile.lock'
+      ],
+      copyAfterInstall: [
+        { from: 'ruby', to: 'gems' }
+      ],
       packageExclude: [
+        'node_modules/**',
         'package.json',
         'package-lock.json',
-        'node_modules/**',
+        'vendor/**',
+        '.bundle'
       ]
     };
 
     this.commands = {
-      pip: `pip install -r ${this.default.dependenciesPath} -t .`,
+      bundle: `bundle install --gemfile=${this.default.dependenciesPath} --path=./`,
     };
 
     const localpackageJson = path.join(
@@ -38,11 +46,11 @@ class PythonRuntime {
   }
 
   async isCompatibleVersion(runtime) {
-    const osVersion = await this.parent.run('python --version');
+    const osVersion = await this.parent.run('ruby --version');
     const [runtimeVersion] = runtime.match(/[0-9].[0-9]/);
     return {
       version: osVersion,
-      isCompatible: osVersion.startsWith(`Python ${runtimeVersion}`)
+      isCompatible: osVersion.startsWith(`ruby ${runtimeVersion}`)
     };
   }
 
@@ -67,4 +75,4 @@ class PythonRuntime {
   }
 }
 
-module.exports = PythonRuntime;
+module.exports = RubyRuntime;

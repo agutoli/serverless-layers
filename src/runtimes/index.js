@@ -1,3 +1,6 @@
+const { exec } = require('child_process');
+
+const ruby = require('./ruby');
 const nodejs = require('./nodejs');
 const python = require('./python');
 
@@ -10,18 +13,37 @@ class Runtimes {
     const patterns = {
       python: [/python/, python],
       nodejs: [/node/, nodejs],
+      ruby: [/ruby/, ruby],
     };
 
     for (const env in patterns) {
       if (patterns[env][0].test(runtime)) {
-        this._runtime = new patterns[env][1](this.plugin, runtime, env);
+        this._runtime = new patterns[env][1](this, runtime, env);
         break;
       }
     }
+
+    if (!this._runtime) {
+      this.plugin.log(`"${runtime}" is not supported (yet).`);
+      process.exit(1);
+    }
+
+    this._runtime.isCompatibleVersion(runtime).then((data) => {
+      if (!data.isCompatible) {
+        this.plugin.error('=============================================================');
+        this.plugin.error(`NOTE: You're currently using incompatible version [${data.version.replace('\n', '')}]`);
+        this.plugin.error('=============================================================\n');
+      }
+    });
   }
 
-  install() {
-    return this._runtime.install();
+  run(cmd) {
+    return new Promise((resolve, reject) => {
+      exec(cmd, (err, stdout, out) => {
+        if (err) return reject(err);
+        return resolve(stdout || out);
+      });
+    });
   }
 
   getDefaultSettings(inboundSettings = {}) {

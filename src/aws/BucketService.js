@@ -46,8 +46,8 @@ class UploadService extends AbstractService {
 
   async downloadDependencesFile() {
     const { dependenciesPath } = this.plugin.settings;
-
     this.plugin.log(`Downloading ${dependenciesPath} from bucket...`);
+
     const params = {
       Bucket: this.bucketName,
       Key: this.dependenceFilename

@@ -1,8 +1,9 @@
 const path = require('path');
 
 class NodeJSRuntime {
-  constructor(plugin, runtime, runtimeDir) {
-    this.plugin = plugin;
+  constructor(parent, runtime, runtimeDir) {
+    this.parent = parent;
+    this.plugin = parent.plugin;
 
     this.default = {
       runtime,
@@ -35,6 +36,15 @@ class NodeJSRuntime {
       this.log(`Error: Can not find ${localpackageJson}!`);
       process.exit(1);
     }
+  }
+
+  async isCompatibleVersion(runtime) {
+    const osVersion = await this.parent.run('node --version');
+    const [runtimeVersion] = runtime.match(/([0-9.]+)/);
+    return {
+      version: osVersion,
+      isCompatible: osVersion.startsWith(`v${runtimeVersion}`)
+    };
   }
 
   isDiff(depsA, depsB) {

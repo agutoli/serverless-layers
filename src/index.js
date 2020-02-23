@@ -1,6 +1,7 @@
 const BbPromise = require('bluebird');
 const path = require('path');
 
+const chalk = require('chalk');
 const Runtimes = require('./runtimes');
 const LayersService = require('./aws/LayersService');
 const BucketService = require('./aws/BucketService');
@@ -94,7 +95,6 @@ class ServerlessLayers {
     }
 
     await this.dependencies.install();
-
     await this.zipService.package();
     await this.bucketService.uploadZipFile();
     const version = await this.layersService.publishVersion();
@@ -210,6 +210,14 @@ class ServerlessLayers {
 
   log(msg) {
     this.serverless.cli.log(`[LayersPlugin]: ${msg}`);
+  }
+
+  warn(msg) {
+    this.serverless.cli.log(chalk.yellowBright(`[LayersPlugin]: ${msg}`));
+  }
+
+  error(msg) {
+    this.serverless.cli.log(chalk.red(`[LayersPlugin]: ${msg}`));
   }
 
   cleanUpLayers() {
