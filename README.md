@@ -12,11 +12,16 @@
 * It reduces deployment time.
 * Share same layers (libraries) with all lambda functions
 
+# Options 
+* [NodeJS](#nodejs-options)
+* [Ruby](#ruby-options)
+* [Python](#python-options)
+
 ## Common requirements
 * AWS only (sorry)
 * Serverless >= 1.34.0 (layers support)
 
-## Requirements NodeJS
+## NodeJS
 * Node >= v6.10.3
 * NPM >= 3.10.10
 * A valid package.json file
@@ -62,7 +67,7 @@ custom:
 | customInstallationCommand | `string` |  | It specify a custom command to install deps ex. `MY_ENV=1 npm --proxy http://myproxy.com i -P` |
 
 
-## Plugin Options NodeJS
+## NodeJS Options
 
 |     Option     |    Type   |   Default   | Description |
 | -------------- | --------- | ----------- | ----------- |
@@ -72,7 +77,7 @@ custom:
 | compatibleRuntimes |  `array` | `['nodejs']` | Possible values: nodejs, nodejs10.x, nodejs12.x |
 
 
-## Plugin Options Python
+## Python Options
 
 |     Option     |    Type   |   Default   | Description |
 | -------------- | --------- | ----------- | ----------- |
