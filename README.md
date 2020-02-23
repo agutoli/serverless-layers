@@ -77,6 +77,15 @@ custom:
 | compatibleRuntimes |  `array` | `['nodejs']` | Possible values: nodejs, nodejs10.x, nodejs12.x |
 
 
+## Ruby Options
+
+|     Option     |    Type   |   Default   | Description |
+| -------------- | --------- | ----------- | ----------- |
+| packageManager |  `string` |    bundle      | Possible values: bundle |
+| dependenciesPath   |  `string` | Gemfile | Note: Available for `>= 2.x` versions. You can specify custom path for your requirements.txt |
+| compatibleRuntimes |  `array` | `['ruby']` | Possible values: ruby2.5, ruby2.7 |
+
+
 ## Python Options
 
 |     Option     |    Type   |   Default   | Description |
