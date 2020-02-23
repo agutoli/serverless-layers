@@ -1,3 +1,6 @@
+# 2.0.2-alpha (2020-02-23)
+- [Added support to Python and Ruby](https://github.com/agutoli/serverless-layers)
+
 # 1.5.0 (2020-02-05)
 - [Added feature to clean up layers when remove stack](https://github.com/agutoli/serverless-layers/pull/23)
 
