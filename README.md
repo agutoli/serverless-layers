@@ -75,7 +75,7 @@ custom:
 | dependenciesPath   |  `string` | package.json | Note: `>= 2.x` versions. You can specify custom path for your package.json |
 | compatibleRuntimes |  `array` | `['nodejs']` | Possible values: nodejs, nodejs10.x, nodejs12.x |
 
-============
+----------------------
 
 ## Ruby
 
@@ -91,7 +91,7 @@ custom:
 | dependenciesPath   |  `string` | Gemfile | Note: Available for `>= 2.x` versions. You can specify custom path for your requirements.txt |
 | compatibleRuntimes |  `array` | `['ruby']` | Possible values: ruby2.5, ruby2.7 |
 
-============
+----------------------
 
 ## Python
 
@@ -106,7 +106,7 @@ custom:
 | dependenciesPath   |  `string` | requirements.txt | Note: Available for `>= 2.x` versions. You can specify custom path for your requirements.txt |
 | compatibleRuntimes |  `array` | `['python']` | Possible values: python2.7, python3.6, python3.7 and python3.8 |
 
-============
+----------------------
 
 ## Default Serverless Setup
 
