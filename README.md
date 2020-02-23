@@ -12,18 +12,15 @@
 * It reduces deployment time.
 * Share same layers (libraries) with all lambda functions
 
+# Options 
+* [NodeJS](#nodejs)
+* [Ruby](#ruby)
+* [Python](#python)
+
 ## Common requirements
 * AWS only (sorry)
 * Serverless >= 1.34.0 (layers support)
 
-## Requirements NodeJS
-* Node >= v6.10.3
-* NPM >= 3.10.10
-* A valid package.json file
-
-## Requirements Python
-* Python >= 2.7
-* A valid requirements.txt file
 
 ## Install
 
@@ -35,21 +32,13 @@ or
 
 Add the plugin to your `serverless.yml` file:
 
-## Simple usage
-```yaml
-provider:
-  ...
-  deploymentBucket:
-    name: 'your_bucket'
-
-plugins:
-  - serverless-layers
-```
-
-## Plugin Common Options
+## Plugin usage
 Example:
 
 ```yaml
+plugins:
+  - serverless-layers
+  
 custom:
   serverless-layers:
     packageManager: npm
@@ -62,7 +51,14 @@ custom:
 | customInstallationCommand | `string` |  | It specify a custom command to install deps ex. `MY_ENV=1 npm --proxy http://myproxy.com i -P` |
 
 
-## Plugin Options NodeJS
+## NodeJS
+
+### Requirements
+* Node >= v6.10.3
+* NPM >= 3.10.10
+* A valid package.json file
+
+### Options
 
 |     Option     |    Type   |   Default   | Description |
 | -------------- | --------- | ----------- | ----------- |
@@ -71,14 +67,38 @@ custom:
 | dependenciesPath   |  `string` | package.json | Note: `>= 2.x` versions. You can specify custom path for your package.json |
 | compatibleRuntimes |  `array` | `['nodejs']` | Possible values: nodejs, nodejs10.x, nodejs12.x |
 
+----------------------
 
-## Plugin Options Python
+## Ruby
 
+### Requirements
+* Ruby >= 2.5
+* A valid Gemfile file
+
+### Options
+
+|     Option     |    Type   |   Default   | Description |
+| -------------- | --------- | ----------- | ----------- |
+| packageManager |  `string` |    bundle      | Possible values: bundle |
+| dependenciesPath   |  `string` | Gemfile | Note: Available for `>= 2.x` versions. You can specify custom path for your requirements.txt |
+| compatibleRuntimes |  `array` | `['ruby']` | Possible values: ruby2.5, ruby2.7 |
+
+----------------------
+
+## Python
+
+### Requirements
+* Python >= 2.7
+* A valid requirements.txt file
+
+### Options
 |     Option     |    Type   |   Default   | Description |
 | -------------- | --------- | ----------- | ----------- |
 | packageManager |  `string` |    pip      | Possible values: pip |
 | dependenciesPath   |  `string` | requirements.txt | Note: Available for `>= 2.x` versions. You can specify custom path for your requirements.txt |
 | compatibleRuntimes |  `array` | `['python']` | Possible values: python2.7, python3.6, python3.7 and python3.8 |
+
+----------------------
 
 ## Default Serverless Setup
 
