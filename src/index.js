@@ -72,10 +72,10 @@ class ServerlessLayers {
       'serverless-layers'
     ];
     return {
-      ...this.runtimes.getDefaultSettings(inboundSettings),
       compileDir: '.serverless',
       customInstallationCommand: null,
-      layersDeploymentBucket: this.service.provider.deploymentBucket
+      layersDeploymentBucket: this.service.provider.deploymentBucket,
+      ...this.runtimes.getDefaultSettings(inboundSettings)
     };
   }
 
