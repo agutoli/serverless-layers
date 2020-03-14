@@ -31,16 +31,20 @@ class RubyRuntime {
     this.commands = {
       bundle: `bundle install --gemfile=${this.default.dependenciesPath} --path=./`,
     };
+  }
+
+  init() {
+    const { dependenciesPath } = this.plugin.settings;
 
     const localpackageJson = path.join(
       process.cwd(),
-      this.default.dependenciesPath
+      dependenciesPath
     );
 
     try {
       this.localPackage = fs.readFileSync(localpackageJson).toString();
     } catch (e) {
-      this.log(`Error: Can not find ${localpackageJson}!`);
+      this.plugin.log(`Error: Can not find ${localpackageJson}!`);
       process.exit(1);
     }
   }

@@ -37,6 +37,10 @@ class Runtimes {
     });
   }
 
+  init() {
+    this._runtime.init();
+  }
+
   run(cmd) {
     return new Promise((resolve, reject) => {
       exec(cmd, (err, stdout, out) => {

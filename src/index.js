@@ -55,7 +55,6 @@ class ServerlessLayers {
     }
 
     this.runtimes = new Runtimes(this);
-
     this.settings = this.getSettings();
 
     this.zipService = new ZipService(this);
@@ -80,6 +79,7 @@ class ServerlessLayers {
   }
 
   async main() {
+    await this.runtimes.init();
     await this.dependencies.init();
 
     const isDifferent = await this.runtimes.hasDependencesChanged();

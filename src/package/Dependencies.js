@@ -40,7 +40,7 @@ class Dependencies extends AbstractService {
     }
 
     return new Promise((resolve) => {
-      copyFile(filename, path.join(this.layersPackageDir, filename), (copyErr) => {
+      copyFile(filename, path.join(this.layersPackageDir, path.basename(filename)), (copyErr) => {
         if (copyErr) throw copyErr;
         return resolve();
       });

@@ -24,16 +24,20 @@ class NodeJSRuntime {
       npm: 'npm install --production',
       yarn: 'yarn --production'
     };
+  }
+
+  init() {
+    const { dependenciesPath } = this.plugin.settings;
 
     const localpackageJson = path.join(
       process.cwd(),
-      this.default.dependenciesPath
+      dependenciesPath
     );
 
     try {
       this.localPackage = require(localpackageJson);
     } catch (e) {
-      this.log(`Error: Can not find ${localpackageJson}!`);
+      this.plugin.log(`Error: Can not find ${localpackageJson}!`);
       process.exit(1);
     }
   }
