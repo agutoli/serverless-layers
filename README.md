@@ -32,7 +32,7 @@ or
 
 Add the plugin to your `serverless.yml` file:
 
-## Plugin usage
+## Single layer config
 Example:
 
 ```yaml
@@ -43,6 +43,37 @@ custom:
   serverless-layers:
     packageManager: npm
 ```
+
+## Multiple layers config
+Example:
+
+```yaml
+plugins:
+  - serverless-layers
+  
+custom:
+  serverless-layers:
+    # It will be attached to all functions
+    - common:
+        dependenciesPath: ./package.json
+    # It will be attached to my_func2
+    - myLayerB:
+        functions:
+          - my_func2
+        dependenciesPath: ./package-custom-name.json
+    # It will be attached to my_func2
+    - myExistentLayer:
+        functions:
+          - my_func2
+        arn: arn:aws:lambda:us-east-1:<your_account>:layer:my-existent-layer
+
+functions:
+  my_func1:
+    handler: handler.hello
+  my_func2:
+    handler: handler.hello
+```
+
 
 |     Option     |    Type   |   Default   | Description |
 | -------------- | --------- | ----------- | ----------- |
