@@ -89,6 +89,8 @@ class ServerlessLayers {
       await this.initServices(layerName, currentSettings);
       await this.main();
     }
+
+    console.log('\n');
   }
 
   async cleanUpAllLayers() {
