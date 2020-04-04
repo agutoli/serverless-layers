@@ -13,7 +13,7 @@
   "homepage": "https://github.com/agutoli/serverless-layers",
   "scripts": {
     "build": "BABEL_ENV=production ./bin/build",
-    "test": "npm run lint",
+    "test": "NODE_ENV=test NODE_PATH=./src mocha 'tests/**/*.test.js' --colors --reporter spec",
     "lint": "eslint src/**/*.js",
     "dev:watch": "nodemon --watch ./src --exec 'npm run lint; npm run build'",
     "lint:watch": "nodemon --watch ./src --exec 'npm run lint'"
@@ -56,7 +56,10 @@
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-react": "^7.12.4",
+    "lodash.set": "^4.3.2",
+    "mocha": "^7.1.1",
     "nodemon": "^1.18.10",
-    "pre-commit": "^1.2.2"
+    "pre-commit": "^1.2.2",
+    "sinon": "^9.0.1"
   }
 }
