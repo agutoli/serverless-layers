@@ -41,11 +41,12 @@
     "fs-copy-file": "^2.1.2",
     "fs-extra": "^8.1.0",
     "glob": "^7.1.6",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "slugify": "^1.4.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.3.3",
+    "@babel/cli": "7.8.4",
+    "@babel/core": "7.8.4",
     "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.3.1",
     "aws-sdk": "^2.402.0",

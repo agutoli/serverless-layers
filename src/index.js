@@ -1,6 +1,6 @@
 const BbPromise = require('bluebird');
 const path = require('path');
-
+const slugify = require('slugify');
 const chalk = require('chalk');
 const Runtimes = require('./runtimes');
 const LayersService = require('./aws/LayersService');
@@ -19,18 +19,31 @@ class ServerlessLayers {
     // hooks
     this.hooks = {
       'before:package:function:package': () => BbPromise.bind(this)
-        .then(() => this.init().then(() =>this.main())),
+        .then(() => {
+          return this.init()
+            .then(() => this.deployLayers())
+        }),
       'before:package:initialize': () => BbPromise.bind(this)
-        .then(() => this.init().then(() =>this.main())),
+        .then(() => {
+          return this.init()
+            .then(() => this.deployLayers())
+        }),
       'aws:info:displayLayers': () => BbPromise.bind(this)
         .then(() => this.init())
         .then(() => this.finalizeDeploy()),
+      'after:deploy:function:deploy': () => BbPromise.bind(this)
+        .then(() => this.init())
+        .then(() => this.finalizeDeploy()),
       'plugin:uninstall:uninstall': () => BbPromise.bind(this)
-        .then(() => this.init())
-        .then(() => this.cleanUpLayers()),
+        .then(() => {
+          return this.init()
+            .then(() => this.cleanUpAllLayers())
+        }),
       'remove:remove': () => BbPromise.bind(this)
-        .then(() => this.init())
-        .then(() => this.cleanUpLayers()),
+        .then(() => {
+          return this.init()
+            .then(() => this.cleanUpAllLayers())
+        })
     };
   }
 
@@ -53,32 +66,95 @@ class ServerlessLayers {
       this.log(`Error: Please install serverless >= 1.34.0 (current ${this.serverless.getVersion()})`)
       process.exit(1);
     }
+  }
 
+  async deployLayers() {
     this.runtimes = new Runtimes(this);
-    this.settings = this.getSettings();
+    const settings = this.getSettings();
+    const cliOpts = this.provider.options;
 
+    for (const layerName in settings) {
+      const currentSettings = settings[layerName];
+      const enabledFuncs = currentSettings.functions;
+
+      // deploying a single function
+      const deploySingle = !!(cliOpts.function && enabledFuncs);
+
+      // skip layers that is not related with specified function
+      if (deploySingle && enabledFuncs.indexOf(cliOpts.function) === -1) {
+        continue;
+      }
+
+      this.logGroup(layerName);
+      await this.initServices(layerName, currentSettings);
+      await this.main();
+    }
+  }
+
+  async cleanUpAllLayers() {
+    this.runtimes = new Runtimes(this);
+    const settings = this.getSettings();
+    for (const layerName in settings) {
+      const currentSettings = settings[layerName];
+      this.logGroup(layerName);
+
+      if (currentSettings.arn) {
+        this.warn(` (skipped) arn: ${currentSettings.arn}`);
+        continue;
+      }
+
+      await this.initServices(layerName, currentSettings);
+      await this.cleanUpLayers();
+    }
+  }
+
+  async initServices(layerName, settings) {
+    this.currentLayerName = layerName;
+    this.settings = settings;
     this.zipService = new ZipService(this);
     this.dependencies = new Dependencies(this);
     this.layersService = new LayersService(this);
     this.bucketService = new BucketService(this);
     this.cloudFormationService = new CloudFormationService(this);
-
     this.initialized = true;
+  }
+
+  mergeCommonSettings(inboundSetting) {
+    return {
+      functions: null,
+      compileDir: '.serverless',
+      customInstallationCommand: null,
+      layersDeploymentBucket: this.service.provider.deploymentBucket,
+      ...this.runtimes.getDefaultSettings(inboundSetting)
+    };
   }
 
   getSettings() {
     const inboundSettings = (this.serverless.service.custom || {})[
       'serverless-layers'
     ];
+
+    if (Array.isArray(inboundSettings)) {
+      const settings = {};
+      inboundSettings.forEach(inboundSetting => {
+        const layerName = Object.keys(inboundSetting)[0];
+        settings[layerName] = this.mergeCommonSettings(inboundSetting[layerName]);
+      });
+      return settings;
+    }
+
     return {
-      compileDir: '.serverless',
-      customInstallationCommand: null,
-      layersDeploymentBucket: this.service.provider.deploymentBucket,
-      ...this.runtimes.getDefaultSettings(inboundSettings)
-    };
+      default: this.mergeCommonSettings(inboundSettings)
+    }
   }
 
   async main() {
+    // static ARN
+    if (this.settings.arn) {
+      this.relateLayerWithFunctions(this.settings.arn);
+      return;
+    }
+
     await this.runtimes.init();
     await this.dependencies.init();
 
@@ -101,6 +177,15 @@ class ServerlessLayers {
     await this.bucketService.uploadDependencesFile();
 
     this.relateLayerWithFunctions(version.LayerVersionArn);
+  }
+
+  getLayerName() {
+    const stackName = this.getStackName();
+    const { runtimeDir } = this.settings;
+    return slugify(`${stackName}-${runtimeDir}-${this.currentLayerName}`, {
+      lower: true,
+      replacement: '-'
+    });
   }
 
   getStackName() {
@@ -136,17 +221,33 @@ class ServerlessLayers {
   }
 
   async getLayerArn() {
-    if (this.cacheObject.LayerVersionArn) {
-      return this.cacheObject.LayerVersionArn;
+    if (!this.cacheObject.layersArn) {
+      this.cacheObject.layersArn = {};
     }
+
+    // returns cached arn
+    if (this.cacheObject.layersArn[this.currentLayerName]) {
+      return this.cacheObject.layersArn[this.currentLayerName];
+    }
+
     const outputs = await this.cloudFormationService.getOutputs();
+    
+
     if (!outputs) return null;
+
     const logicalId = this.getOutputLogicalId();
-    return (outputs.find(x => x.OutputKey === logicalId) || {}).OutputValue;
+
+    const arn = (outputs.find(x => x.OutputKey === logicalId) || {}).OutputValue;
+
+    // cache arn
+    this.cacheObject.layersArn[this.currentLayerName] = arn;
+  
+    return arn;
   }
 
   getOutputLogicalId() {
-    return this.provider.naming.getLambdaLayerOutputLogicalId(this.getStackName());
+    const value = this.getLayerName().replace(this.getStackName() + '-', '');
+    return this.provider.naming.getLambdaLayerOutputLogicalId(value);
   }
 
   mergePackageOptions() {
@@ -171,13 +272,29 @@ class ServerlessLayers {
 
   relateLayerWithFunctions(layerArn) {
     this.log('Associating layers...');
-
     const { functions } = this.service;
+    const funcs = this.settings.functions;
+    const cliOpts = this.provider.options;
 
     Object.keys(functions).forEach(funcName => {
-      functions[funcName].layers = functions[funcName].layers || [];
-      functions[funcName].layers.push(layerArn);
-      this.log(`function.${funcName} - ${layerArn}`);
+      if (cliOpts.function && cliOpts.function !== funcName) {
+        return;
+      }
+
+      let isEnabled = !funcs;
+
+      if (Array.isArray(funcs) && funcs.indexOf(funcName) !== -1) {
+        isEnabled = true;
+      }
+
+      if (isEnabled) {
+        functions[funcName].layers = functions[funcName].layers || [];
+        functions[funcName].layers.push(layerArn);
+        functions[funcName].layers = Array.from(new Set(functions[funcName].layers));
+        this.log(`function.${funcName} - ${chalk.bold(layerArn)}`, ' ✓');
+      } else {
+        this.warn(`(Skipped) function.${funcName}`, ` x`);
+      }
     });
 
     this.service.resources = this.service.resources || {};
@@ -202,22 +319,43 @@ class ServerlessLayers {
   }
 
   async finalizeDeploy() {
-    const currentLayerARN = await this.getLayerArn();
+    const cliOpts = this.provider.options;
+    this.logGroup("Layers Info");
     Object.keys(this.service.functions).forEach(funcName => {
-      this.log(`function.${funcName} = layers.${currentLayerARN}`);
+      const lambdaFunc = this.service.functions[funcName];
+      const layers = lambdaFunc.layers || [];
+
+      if (!cliOpts.function && layers.length === 0) {
+        this.warn(`(skipped) function.${funcName}`);
+        return;
+      }
+      
+      layers.forEach((currentLayerARN) => {
+        if (cliOpts.function && cliOpts.function === funcName) {
+          this.log(`function.${funcName} = layers.${chalk.bold(currentLayerARN)}`);
+          return;
+        }
+        this.log(`function.${funcName} = layers.${chalk.bold(currentLayerARN)}`);
+      });
     });
+    console.log('\n');
   }
 
-  log(msg) {
-    this.serverless.cli.log(`[LayersPlugin]: ${msg}`);
+  log(msg, signal=' ○') {
+    console.log('...' + `${chalk.greenBright.bold(signal)} ${chalk.white(msg)}`);
   }
 
-  warn(msg) {
-    this.serverless.cli.log(chalk.yellowBright(`[LayersPlugin]: ${msg}`));
+  logGroup(msg) {
+    console.log('\n');
+    this.serverless.cli.log(`[ LayersPlugin ]: ${chalk.magenta.bold('=>')} ${chalk.greenBright.bold(msg)}`);
   }
 
-  error(msg) {
-    this.serverless.cli.log(chalk.red(`[LayersPlugin]: ${msg}`));
+  warn(msg, signal=' ∅') {
+    console.log('...' + chalk.yellowBright(`${chalk.yellowBright.bold(signal)} ${msg}`));
+  }
+
+  error(msg, signal=' ⊗') {
+    console.log('...' + chalk.red(`${signal} ${chalk.white.bold(msg)}`));
   }
 
   cleanUpLayers() {

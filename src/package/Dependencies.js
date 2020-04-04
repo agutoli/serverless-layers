@@ -1,4 +1,5 @@
 const fs = require('fs');
+const chalk = require('chalk');
 const fsExtra = require('fs-extra');
 const glob = require('glob');
 const path = require('path');
@@ -31,16 +32,17 @@ class Dependencies extends AbstractService {
     return output;
   }
 
-  copyProjectFile(filename) {
+  copyProjectFile(filePath, fileName = null) {
     this.init();
 
-    if (!fs.existsSync(filename)) {
-      this.plugin.warn(`[warning] "${filename}" file does not exists!`);
+    if (!fs.existsSync(filePath)) {
+      this.plugin.warn(`[warning] "${filePath}" file does not exists!`);
       return true;
     }
 
     return new Promise((resolve) => {
-      copyFile(filename, path.join(this.layersPackageDir, path.basename(filename)), (copyErr) => {
+      const destFile = path.join(this.layersPackageDir, fileName || path.basename(filePath));
+      copyFile(filePath, destFile, (copyErr) => {
         if (copyErr) throw copyErr;
         return resolve();
       });
@@ -54,7 +56,18 @@ class Dependencies extends AbstractService {
     this.plugin.log('Dependencies has changed! Re-installing...');
 
     await mkdirp.sync(this.layersPackageDir);
-    await this.copyProjectFile(this.plugin.settings.dependenciesPath);
+
+    /**
+     * This is necessary because npm is
+     * not possible to specify a custom
+     * name for package.json.
+     */
+    let renameFilename = null;
+    if (this.plugin.settings.runtimeDir === 'nodejs') {
+      renameFilename = 'package.json';
+    }
+
+    await this.copyProjectFile(this.plugin.settings.dependenciesPath, renameFilename);
 
     for (const index in copyBeforeInstall) {
       const filename = copyBeforeInstall[index];
@@ -65,10 +78,10 @@ class Dependencies extends AbstractService {
 
     // custom commands
     if (this.plugin.settings.customInstallationCommand) {
-      console.log(await this.run(this.plugin.settings.customInstallationCommand));
+      console.log(chalk.white(await this.run(this.plugin.settings.customInstallationCommand)));
     } else {
       const commands = this.plugin.runtimes.getCommands();
-      console.log(await this.run(commands[this.plugin.settings.packageManager]));
+      console.log(chalk.white(await this.run(commands[this.plugin.settings.packageManager])));
     }
 
     for (const index in copyAfterInstall) {
