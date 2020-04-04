@@ -41,7 +41,15 @@ plugins:
   
 custom:
   serverless-layers:
-    packageManager: npm
+    functions: # optional
+      - my_func2
+    dependenciesPath: ./package.json
+
+functions:
+  my_func1:
+    handler: handler.hello
+  my_func2:
+    handler: handler.hello
 ```
 
 ## Multiple layers config
