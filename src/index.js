@@ -204,7 +204,7 @@ class ServerlessLayers {
   }
 
   getPathZipFileName() {
-    return `${path.join(process.cwd(), this.settings.compileDir, this.getStackName())}.zip`;
+    return `${path.join(process.cwd(), this.settings.compileDir, this.getLayerName())}.zip`;
   }
 
   getBucketLayersPath() {
