@@ -167,7 +167,7 @@ class ServerlessLayers {
 
     const currentLayerARN = await this.getLayerArn();
     if (!isDifferent && currentLayerARN) {
-     this.log(`Not has changed! Using same layer arn: ${currentLayerARN}`);
+     this.log(`${chalk.inverse.green(' No changes ')}! Using same layer arn: ${this.logArn(currentLayerARN)}`);
      this.relateLayerWithFunctions(currentLayerARN);
      return;
     }
@@ -273,7 +273,7 @@ class ServerlessLayers {
   }
 
   relateLayerWithFunctions(layerArn) {
-    this.log('Associating layers...');
+    this.log('Adding layers...');
     const { functions } = this.service;
     const funcs = this.settings.functions;
     const cliOpts = this.provider.options;
@@ -293,7 +293,7 @@ class ServerlessLayers {
         functions[funcName].layers = functions[funcName].layers || [];
         functions[funcName].layers.push(layerArn);
         functions[funcName].layers = Array.from(new Set(functions[funcName].layers));
-        this.log(`function.${chalk.magenta.bold(funcName)} - ${chalk.bold(layerArn)}`, ' ✓');
+        this.log(`function.${chalk.magenta.bold(funcName)} - ${this.logArn(layerArn)}`, ' ✓');
       } else {
         this.warn(`(Skipped) function.${chalk.magenta.bold(funcName)}`, ` x`);
       }
@@ -334,10 +334,10 @@ class ServerlessLayers {
       
       layers.forEach((currentLayerARN) => {
         if (cliOpts.function && cliOpts.function === funcName) {
-          this.log(`function.${chalk.magenta.bold(funcName)} = layers.${chalk.bold(currentLayerARN)}`);
+          this.log(`function.${chalk.magenta.bold(funcName)} = layers.${this.logArn(currentLayerARN)}`);
           return;
         }
-        this.log(`function.${chalk.magenta.bold(funcName)} = layers.${chalk.bold(currentLayerARN)}`);
+        this.log(`function.${chalk.magenta.bold(funcName)} = layers.${this.logArn(currentLayerARN)}`);
       });
     });
     console.log('\n');
@@ -362,6 +362,14 @@ class ServerlessLayers {
 
   cleanUpLayers() {
     return this.layersService.cleanUpLayers();
+  }
+
+  logArn(arn) {
+    let pattern = /arn:aws:lambda:([^:]+):([0-9]+):layer:([^:]+):([0-9]+)/g;
+    let region = chalk.bold('$1');
+    let name = chalk.magenta('$3');
+    let formated = chalk.white(`arn:aws:lambda:${region}:*********:${name}:$4`)
+    return arn.replace(pattern, formated);
   }
 }
 

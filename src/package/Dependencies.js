@@ -53,7 +53,7 @@ class Dependencies extends AbstractService {
     const { copyBeforeInstall, copyAfterInstall } = this.plugin.settings;
 
     this.init();
-    this.plugin.log('Dependencies has changed! Re-installing...');
+    this.plugin.log(`${chalk.inverse.yellow(' Changes identified ')}! Re-installing...`);
 
     await mkdirp.sync(this.layersPackageDir);
 
