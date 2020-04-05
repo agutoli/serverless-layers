@@ -85,6 +85,7 @@ functions:
     handler: handler.hello
 ```
 
+![Screen Shot 2020-04-05 at 2 04 38 pm](https://user-images.githubusercontent.com/298845/78466747-2fb58f80-7748-11ea-948d-4fce40a753bb.png)
 
 
 |     Option     |    Type   |   Default   | Description |
