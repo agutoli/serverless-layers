@@ -5,12 +5,12 @@
 [![Build Status](https://travis-ci.org/agutoli/serverless-layers.svg?branch=master)](https://travis-ci.org/agutoli/serverless-layers)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 ![Node.js CI](https://github.com/agutoli/serverless-layers/workflows/Node.js%20CI/badge.svg)
-* Automatically attach layers for each lambda function
-* Creates a new layer version when `depenedencies` was updated
-* If a `dependence` was not changed, it does not publish a new layer
-* Reduces drastically lambda size
+* It attaches automatically layers for each function
+* It creates a new layer's version when `depenedencies` is updated
+* If `depenedencies` is not changed, it does not publish a new layer
+* It reduces drastically lambda size
 * It reduces deployment time.
-* Share same layers (libraries) with all lambda functions
+* You can share same layers (libraries) among all lambda functions
 
 # Options 
 * [NodeJS](#nodejs)
