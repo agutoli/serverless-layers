@@ -61,30 +61,28 @@ plugins:
   
 custom:
   serverless-layers:
-    # It will be attached to all functions
+    # applies for all lambdas 
     - common:
-        dependenciesPath: ./package.json
-    # It will be attached to my_func2
-    - myLayerB:
+        dependenciesPath: ./my-folder/package.json
+    # apply for foo only
+    - foo:
         functions:
-          - my_func2
-        dependenciesPath: ./package-custom-name.json
-    # It will be attached to my_func1 and my_func2
-    - myExistentLayer:
+          - foo
+        dependenciesPath: my-folder/package-foo.json
+    - staticArn:
         functions:
-          - my_func1
-          - my_func2
-        arn: arn:aws:lambda:us-east-1:<your_account>:layer:my-existent-layer
+          - foo
+          - bar
+        arn: arn:aws:lambda:us-east-1:<your_account>:layer:node-v13-11-0:5
 
 functions:
-  my_func1:
+  foo:
     handler: handler.hello
-  my_func2:
-    handler: handler.hello
-  my_func3:
+  bar:
     handler: handler.hello
 ```
 
+![Screen Shot 2020-04-05 at 2 04 38 pm](https://user-images.githubusercontent.com/298845/78466747-2fb58f80-7748-11ea-948d-4fce40a753bb.png)
 
 
 |     Option     |    Type   |   Default   | Description |
