@@ -293,9 +293,9 @@ class ServerlessLayers {
         functions[funcName].layers = functions[funcName].layers || [];
         functions[funcName].layers.push(layerArn);
         functions[funcName].layers = Array.from(new Set(functions[funcName].layers));
-        this.log(`function.${funcName} - ${chalk.bold(layerArn)}`, ' ✓');
+        this.log(`function.${chalk.magenta.bold(funcName)} - ${chalk.bold(layerArn)}`, ' ✓');
       } else {
-        this.warn(`(Skipped) function.${funcName}`, ` x`);
+        this.warn(`(Skipped) function.${chalk.magenta.bold(funcName)}`, ` x`);
       }
     });
 
@@ -328,16 +328,16 @@ class ServerlessLayers {
       const layers = lambdaFunc.layers || [];
 
       if (!cliOpts.function && layers.length === 0) {
-        this.warn(`(skipped) function.${funcName}`);
+        this.warn(`(skipped) function.${chalk.magenta.bold(funcName)}`);
         return;
       }
       
       layers.forEach((currentLayerARN) => {
         if (cliOpts.function && cliOpts.function === funcName) {
-          this.log(`function.${funcName} = layers.${chalk.bold(currentLayerARN)}`);
+          this.log(`function.${chalk.magenta.bold(funcName)} = layers.${chalk.bold(currentLayerARN)}`);
           return;
         }
-        this.log(`function.${funcName} = layers.${chalk.bold(currentLayerARN)}`);
+        this.log(`function.${chalk.magenta.bold(funcName)} = layers.${chalk.bold(currentLayerARN)}`);
       });
     });
     console.log('\n');
