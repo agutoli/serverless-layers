@@ -7,7 +7,7 @@
 ![Node.js CI](https://github.com/agutoli/serverless-layers/workflows/Node.js%20CI/badge.svg)
 * Automatically attach layers for each lambda function
 * Creates a new layer version when `depenedencies` was updated
-* If `dependencie` was not changed, it does not publish a new layer
+* If a `dependence` was not changed, it does not publish a new layer
 * Reduces drastically lambda size
 * It reduces deployment time.
 * Share same layers (libraries) with all lambda functions
