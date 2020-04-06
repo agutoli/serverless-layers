@@ -21,7 +21,7 @@ class NodeJSRuntime {
     };
 
     this.commands = {
-      npm: 'npm install --production',
+      npm: 'npm install --production --only=prod',
       yarn: 'yarn --production'
     };
   }
