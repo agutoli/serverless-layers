@@ -248,8 +248,7 @@ class ServerlessLayers {
   }
 
   getOutputLogicalId() {
-    const value = this.getLayerName().replace(this.getStackName() + '-', '');
-    return this.provider.naming.getLambdaLayerOutputLogicalId(value);
+    return this.provider.naming.getLambdaLayerOutputLogicalId(this.getLayerName());
   }
 
   mergePackageOptions() {
