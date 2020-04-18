@@ -38,6 +38,7 @@
     "bluebird": "^3.5.3",
     "chalk": "^3.0.0",
     "copy": "^0.3.2",
+    "folder-hash": "^3.3.0",
     "fs-copy-file": "^2.1.2",
     "fs-extra": "^8.1.0",
     "glob": "^7.1.6",

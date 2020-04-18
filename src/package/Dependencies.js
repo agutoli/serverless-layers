@@ -24,6 +24,13 @@ class Dependencies extends AbstractService {
     this.layersPackageDir = path.join(process.cwd(), this.plugin.settings.compileDir, 'layers', runtimeDir);
   }
 
+  getDepsPath() {
+    const { settings } = this.plugin;
+    const rooPath = path.join(settings.path, settings.dependenciesPath);
+
+    return path.resolve(rooPath);
+  }
+
   async run(cmd) {
     const output = execSync(cmd, {
       cwd: this.layersPackageDir,
@@ -67,7 +74,7 @@ class Dependencies extends AbstractService {
       renameFilename = 'package.json';
     }
 
-    await this.copyProjectFile(this.plugin.settings.dependenciesPath, renameFilename);
+    await this.copyProjectFile(this.getDepsPath(), renameFilename);
 
     for (const index in copyBeforeInstall) {
       const filename = copyBeforeInstall[index];

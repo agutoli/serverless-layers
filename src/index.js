@@ -7,6 +7,7 @@ const LayersService = require('./aws/LayersService');
 const BucketService = require('./aws/BucketService');
 const CloudFormationService = require('./aws/CloudFormationService');
 const ZipService = require('./package/ZipService');
+const LocalFolders = require('./package/LocalFolders');
 const Dependencies = require('./package/Dependencies');
 
 class ServerlessLayers {
@@ -71,6 +72,7 @@ class ServerlessLayers {
   async deployLayers() {
     this.runtimes = new Runtimes(this);
     const settings = this.getSettings();
+
     const cliOpts = this.provider.options;
 
     for (const layerName in settings) {
@@ -115,6 +117,7 @@ class ServerlessLayers {
     this.settings = settings;
     this.zipService = new ZipService(this);
     this.dependencies = new Dependencies(this);
+    this.localFolders = new LocalFolders(this);
     this.layersService = new LayersService(this);
     this.bucketService = new BucketService(this);
     this.cloudFormationService = new CloudFormationService(this);
@@ -123,6 +126,7 @@ class ServerlessLayers {
 
   mergeCommonSettings(inboundSetting) {
     return {
+      path: '.',
       functions: null,
       compileDir: '.serverless',
       customInstallationCommand: null,
@@ -233,7 +237,7 @@ class ServerlessLayers {
     }
 
     const outputs = await this.cloudFormationService.getOutputs();
-    
+
 
     if (!outputs) return null;
 
@@ -243,7 +247,7 @@ class ServerlessLayers {
 
     // cache arn
     this.cacheObject.layersArn[this.currentLayerName] = arn;
-  
+
     return arn;
   }
 
@@ -330,7 +334,7 @@ class ServerlessLayers {
         this.warn(`(skipped) function.${chalk.magenta.bold(funcName)}`);
         return;
       }
-      
+
       layers.forEach((currentLayerARN) => {
         if (cliOpts.function && cliOpts.function === funcName) {
           this.log(`function.${chalk.magenta.bold(funcName)} = layers.${this.logArn(currentLayerARN)}`);
