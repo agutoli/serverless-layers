@@ -8,6 +8,7 @@ class NodeJSRuntime {
     this.default = {
       runtime,
       runtimeDir,
+      libraryFolder: 'node_modules',
       packageManager:  'npm',
       dependenciesPath: 'package.json',
       compatibleRuntimes: [runtimeDir],

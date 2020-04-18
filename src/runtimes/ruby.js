@@ -10,6 +10,7 @@ class RubyRuntime {
     this.default = {
       runtime,
       runtimeDir,
+      libraryFolder: 'gems',
       packageManager:  'bundle',
       dependenciesPath: 'Gemfile',
       compatibleRuntimes: [runtime],

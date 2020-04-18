@@ -20,8 +20,8 @@ function resolveFile(from) {
 
 class Dependencies extends AbstractService {
   init() {
-    const { runtimeDir } = this.plugin.settings;
-    this.layersPackageDir = path.join(process.cwd(), this.plugin.settings.compileDir, 'layers', runtimeDir);
+    this.layersPackageDir = this.getLayerPackageDir();
+    return mkdirp.sync(this.layersPackageDir);
   }
 
   getDepsPath() {
@@ -61,8 +61,6 @@ class Dependencies extends AbstractService {
 
     this.init();
     this.plugin.log(`${chalk.inverse.yellow(' Changes identified ')}! Re-installing...`);
-
-    await mkdirp.sync(this.layersPackageDir);
 
     /**
      * This is necessary because npm is

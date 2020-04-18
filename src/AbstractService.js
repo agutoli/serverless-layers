@@ -4,8 +4,6 @@ class AbstractService {
   constructor(plugin) {
     this.plugin = plugin;
 
-    const { runtimeDir } = this.plugin.settings;
-
     this.stackName = plugin.getStackName();
     this.layerName = plugin.getLayerName();
     this.bucketName = plugin.getBucketName();
@@ -18,6 +16,11 @@ class AbstractService {
       this.zipFileKeyName = this.zipFileKeyName.replace(/\\/g, '/');
       this.dependenceFilename = this.dependenceFilename.replace(/\\/g, '/');
     }
+  }
+
+  getLayerPackageDir() {
+    const { compileDir, runtimeDir } = this.plugin.settings;
+    return path.join(process.cwd(), compileDir, 'layers', runtimeDir);;
   }
 }
 

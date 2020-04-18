@@ -9,6 +9,7 @@ class PythonRuntime {
     this.default = {
       runtime,
       runtimeDir,
+      libraryFolder: 'site-packages',
       packageManager:  'pip',
       dependenciesPath: 'requirements.txt',
       compatibleRuntimes: [runtime],

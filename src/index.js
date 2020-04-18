@@ -128,6 +128,7 @@ class ServerlessLayers {
     return {
       path: '.',
       functions: null,
+      dependencyInstall: true,
       compileDir: '.serverless',
       customInstallationCommand: null,
       layersDeploymentBucket: this.service.provider.deploymentBucket,
@@ -154,6 +155,24 @@ class ServerlessLayers {
     }
   }
 
+  hasSettingsChanged() {
+    const manifest = '__meta__/manifest-settings.json';
+    const currentSettings = JSON.stringify(this.settings);
+    return this.bucketService.getFile(manifest).then((remoteSettings) => {
+      // create and return true (changed)
+      if (!remoteSettings) {
+        return this.bucketService.putFile(manifest, currentSettings)
+          .then(() => true);
+      }
+
+      if (remoteSettings !== currentSettings) {
+        return true;
+      }
+
+      return false;
+    });
+  }
+
   async main() {
     // static ARN
     if (this.settings.arn) {
@@ -163,24 +182,52 @@ class ServerlessLayers {
 
     await this.runtimes.init();
     await this.dependencies.init();
+    await this.localFolders.init();
 
-    const isDifferent = await this.runtimes.hasDependencesChanged();
+    // it avoids issues if user changes some configuration
+    // which will not be applied till dependencies be changed
+    let hasSettingsChanged = await this.hasSettingsChanged();
+
+    // check if directories content has changed
+    // comparing hash md5 remote with local folder
+    let hasFoldersChanged = false;
+    if (this.settings.localDir) {
+      hasFoldersChanged = await this.localFolders.hasFoldersChanged();
+    }
+
+    // check if dependencies has changed comparing
+    // remote package.json with local one
+    let hasDepsChanged = false;
+    if (this.settings.dependencyInstall) {
+      hasDepsChanged = await this.runtimes.hasDependencesChanged();
+    }
+
+    // check if something has changed
+    let hasChanged = (!hasFoldersChanged && !hasDepsChanged && !hasSettingsChanged);
 
     // merge package default options
     this.mergePackageOptions();
 
     const currentLayerARN = await this.getLayerArn();
-    if (!isDifferent && currentLayerARN) {
+    if (hasChanged && currentLayerARN) {
      this.log(`${chalk.inverse.green(' No changes ')}! Using same layer arn: ${this.logArn(currentLayerARN)}`);
      this.relateLayerWithFunctions(currentLayerARN);
      return;
     }
 
-    await this.dependencies.install();
+    // ENABLED by default
+    if (this.settings.dependencyInstall) {
+      await this.dependencies.install();
+    }
+
+    if (this.settings.localDir) {
+      await this.localFolders.copyFolders();
+    }
+
     await this.zipService.package();
     await this.bucketService.uploadZipFile();
     const version = await this.layersService.publishVersion();
-    await this.bucketService.uploadDependencesFile();
+    await this.bucketService.putFile(this.dependencies.getDepsPath());
 
     this.relateLayerWithFunctions(version.LayerVersionArn);
   }
