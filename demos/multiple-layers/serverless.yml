@@ -1,0 +1,26 @@
+service: multiple-layers
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs12.x
+  deploymentBucket:
+    name: your-bucket
+
+custom:
+  serverless-layers:
+    - common:
+        dependenciesPath: ./my-folder/package.json
+    - myLayerArn:
+        functions:
+          - foo
+        arn: arn:aws:lambda:us-east-1:<your_account>:layer:node-v13-11-0:5
+
+functions:
+  foo:
+    handler: handler.foo
+  bar:
+    handler: handler.bar
+
+plugins:
+  - serverless-layers

@@ -1,0 +1,9 @@
+{
+  "name": "local-folders-layers",
+  "description": "",
+  "version": "0.1.0",
+  "dependencies": {},
+  "devDependencies": {
+    "serverless-layers": "2.1.3"
+  }
+}

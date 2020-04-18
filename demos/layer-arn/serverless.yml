@@ -1,0 +1,19 @@
+service: demo-layer-arn
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs12.x
+  deploymentBucket:
+    name: your-bucket
+
+custom:
+  serverless-layers:
+    arn: arn:aws:lambda:us-east-1:<your_account>:layer:node-v13-11-0:5
+
+functions:
+  hello:
+    handler: handler.hello
+
+plugins:
+  - serverless-layers

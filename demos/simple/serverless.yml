@@ -1,0 +1,15 @@
+service: demo-simple
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs12.x
+  deploymentBucket:
+    name: your-bucket
+
+functions:
+  hello:
+    handler: handler.hello
+
+plugins:
+  - serverless-layers

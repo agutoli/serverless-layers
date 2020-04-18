@@ -1,0 +1,12 @@
+{
+  "name": "my-lib-name",
+  "main": "./main.js",
+  "description": "",
+  "version": "0.1.0",
+  "dependencies": {
+    "express": "^4.17.0"
+  },
+  "devDependencies": {
+    "slugify": "^1.4.0"
+  }
+}

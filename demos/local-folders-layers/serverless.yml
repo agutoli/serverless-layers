@@ -1,0 +1,28 @@
+service: local-folders-layers
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs12.x
+  deploymentBucket:
+    name: your-bucket
+
+custom:
+  serverless-layers:
+    - my-local-folder:
+        dependenciesPath: ./package.json
+        localDir:
+          name: my-lib-name
+          path: ./myLocalLibSource
+          folders:
+            include:
+              - '*.js'
+            exclude:
+              - node_modules
+
+functions:
+  hello:
+    handler: handler.hello
+
+plugins:
+  - serverless-layers
