@@ -150,19 +150,6 @@ class ServerlessLayers {
       return settings;
     }
 
-    const keys = Object.keys(inboundSettings);
-    if (keys.length > 1) {
-      this.error('It looks like you are trying to setup a list of layers, no?\n');
-      console.log('Tip: You probably need specify layer name starting with "', chalk.red.bold('-'), '" character. Ex.\n');
-      console.log('custom:');
-      console.log('  serverless-layers:');
-      keys.forEach((layerOpt) => {
-        console.log('   ',chalk.red.bold('-'), chalk.bold(layerOpt));
-        console.log('        option: ...');
-      })
-      process.exit(1);
-    }
-
     return {
       default: this.mergeCommonSettings(inboundSettings)
     }
