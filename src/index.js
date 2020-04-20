@@ -156,9 +156,24 @@ class ServerlessLayers {
   }
 
   hasSettingsChanged() {
+    // don't check settings changes twice
+    if (this.hasSettingsVerified) {
+      return false;
+    }
+
+    // by pass settings
+    if (!this.settings.localDir) {
+      return false;
+    }
+
     const manifest = '__meta__/manifest-settings.json';
     const currentSettings = JSON.stringify(this.settings);
+
+    // settings checked
+    this.hasSettingsVerified = true;
+
     return this.bucketService.getFile(manifest).then((remoteSettings) => {
+
       // create and return true (changed)
       if (!remoteSettings) {
         return this.bucketService.putFile(manifest, currentSettings)
@@ -166,7 +181,8 @@ class ServerlessLayers {
       }
 
       if (remoteSettings !== currentSettings) {
-        return true;
+        return this.bucketService.putFile(manifest, currentSettings)
+          .then(() => true);
       }
 
       return false;
