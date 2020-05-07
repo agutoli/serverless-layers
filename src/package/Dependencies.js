@@ -76,7 +76,7 @@ class Dependencies extends AbstractService {
 
     for (const index in copyBeforeInstall) {
       const filename = copyBeforeInstall[index];
-      if (!fs.existsSync(filename)) {
+      if (fs.existsSync(filename)) {
         await this.copyProjectFile(filename);
       }
     }
