@@ -6,8 +6,8 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 ![Node.js CI](https://github.com/agutoli/serverless-layers/workflows/Node.js%20CI/badge.svg)
 * It attaches automatically layers for each function
-* It creates a new layer's version when `depenedencies` is updated
-* If `depenedencies` is not changed, it does not publish a new layer
+* It creates a new layer's version when `dependencies` is updated
+* If `dependencies` is not changed, it does not publish a new layer
 * It reduces drastically lambda size
 * It reduces deployment time.
 * You can share same layers (libraries) among all lambda functions
