@@ -34,7 +34,8 @@ class Dependencies extends AbstractService {
   async run(cmd) {
     const output = execSync(cmd, {
       cwd: this.layersPackageDir,
-      env: process.env
+      env: process.env,
+      maxBuffer: 1024 * 1024 * 500
     }).toString();
     return output;
   }
