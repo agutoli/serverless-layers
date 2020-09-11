@@ -2,6 +2,7 @@ const BbPromise = require('bluebird');
 const path = require('path');
 const slugify = require('slugify');
 const chalk = require('chalk');
+const semver = require('semver');
 const Runtimes = require('./runtimes');
 const LayersService = require('./aws/LayersService');
 const BucketService = require('./aws/BucketService');
@@ -61,10 +62,10 @@ class ServerlessLayers {
     this.log = this.log.bind(this);
     this.main = this.main.bind(this);
 
-    const version = this.serverless.getVersion().replace(/\./g, '');
+    const version = this.serverless.getVersion();
 
-    if (version < 1340) {
-      this.log(`Error: Please install serverless >= 1.34.0 (current ${this.serverless.getVersion()})`)
+    if (semver.lt(version, '1.34.0')) {
+      this.log(`Error: Please install serverless >= 1.34.0 (current ${this.serverless.getVersion()})`);
       process.exit(1);
     }
   }
