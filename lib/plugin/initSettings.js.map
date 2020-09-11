@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/plugin/initSettings.js"],"names":["module","exports"],"mappings":";;AAAAA,MAAM,CAACC,OAAP,GAAiB,EAAjB","sourcesContent":["module.exports = {\n  \n}\n"],"file":"initSettings.js"}
