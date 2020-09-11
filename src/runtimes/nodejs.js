@@ -46,7 +46,7 @@ class NodeJSRuntime {
 
   async isCompatibleVersion(runtime) {
     const osVersion = await this.parent.run('node --version');
-    const [runtimeVersion] = runtime.match(/([0-9.]+)/);
+    const [runtimeVersion] = runtime.match(/([0-9]+)\./);
     return {
       version: osVersion,
       isCompatible: osVersion.startsWith(`v${runtimeVersion}`)

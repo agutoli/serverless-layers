@@ -48,10 +48,9 @@ describe('Runtime', () => {
         return runtimes._runtime.isCompatibleVersion('v12.16').then((res) => {
           expect(res.isCompatible).to.equal(true);
         })
-
-        return runtimes._runtime.isCompatibleVersion('v2.0.0').then((res) => {
+        .then(() => runtimes._runtime.isCompatibleVersion('v12.18.3').then((res) => {
           expect(res.isCompatible).to.equal(true);
-        })
+        }));
       })
 
       it('compares two package json and returns if different', () => {
