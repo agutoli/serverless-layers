@@ -12,7 +12,7 @@
 * It reduces deployment time.
 * You can share same layers (libraries) among all lambda functions
 
-# Options 
+# Options
 * [NodeJS](#nodejs)
 * [Ruby](#ruby)
 * [Python](#python)
@@ -38,7 +38,7 @@ Example:
 ```yaml
 plugins:
   - serverless-layers
-  
+
 custom:
   serverless-layers:
     functions: # optional
@@ -58,10 +58,10 @@ Example:
 ```yaml
 plugins:
   - serverless-layers
-  
+
 custom:
   serverless-layers:
-    # applies for all lambdas 
+    # applies for all lambdas
     - common:
         dependenciesPath: ./my-folder/package.json
     # apply for foo only
