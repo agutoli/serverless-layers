@@ -1,5 +1,5 @@
 # 2.3.1
-- Deploy layers during deploy artifact hooks rather than package initialization hooks
+- Deploy layers during package create artifact hooks rather than package initialization hooks
 
 # 2.0.2-alpha (2020-02-23)
 - [Added support to Python and Ruby](https://github.com/agutoli/serverless-layers)
