@@ -1,4 +1,4 @@
-# 2.3.1
+# 2.3.0-alpha (2020-10-10)
 - Deploy layers during package create artifact hooks rather than package initialization hooks
 
 # 2.0.2-alpha (2020-02-23)
