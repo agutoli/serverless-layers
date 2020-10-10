@@ -1,5 +1,8 @@
-# 2.3.0-alpha (2020-10-10)
+# 2.4.0-alpha.0 (2020-10-10)
 - Deploy layers during package create artifact hooks rather than package initialization hooks
+
+# 2.3.0 (2020-09-11)
+- [Bugfix: Minor version validation](https://github.com/agutoli/serverless-layers/pull/50)
 
 # 2.0.2-alpha (2020-02-23)
 - [Added support to Python and Ruby](https://github.com/agutoli/serverless-layers)
