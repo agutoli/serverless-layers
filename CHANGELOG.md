@@ -1,3 +1,6 @@
+# 2.3.1 (11-11-23)
+- [Bugfix Error: "undefined" is not supported (yet).](https://github.com/agutoli/serverless-layers/issues/41)
+
 # 2.0.2-alpha (2020-02-23)
 - [Added support to Python and Ruby](https://github.com/agutoli/serverless-layers)
 
