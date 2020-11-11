@@ -3,9 +3,14 @@ service: demo-simple
 provider:
   name: aws
   region: us-east-1
-  runtime: nodejs12.x
+  runtime: python3.8
   deploymentBucket:
     name: your-bucket
+
+custom:
+  serverless-layers:
+    dependenciesPath: requirements.txt
+    compatibleRuntimes: ["python3.8"]
 
 functions:
   hello:
