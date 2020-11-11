@@ -4,11 +4,12 @@ const sinon = require('sinon');
 const Runtime = require('runtimes');
 
 const nodejsConfig = require('./fixtures/nodejsConfig')
+const pythonConfig = require('./fixtures/pythonConfig')
 
 describe('Runtime', () => {
-  let plugin;
-  let runtimes;
   describe('-> NodeJs', () => {
+    let plugin;
+    let runtimes;
     beforeEach(() => {
       plugin = {
         log: sinon.mock(),
@@ -59,5 +60,34 @@ describe('Runtime', () => {
         });
       })
     });
+  });
+
+  describe('-> Python', () => {
+    let plugin;
+    let runtimes;
+
+    beforeEach(() => {
+      plugin = {
+        log: sinon.spy(),
+        error: sinon.spy(),
+      };
+      process.exit = sinon.spy();
+    });
+
+    it('should throw error when undefined runtime', () => {
+      lodashSet(plugin, 'service.provider.runtime', undefined);
+      runtimes = new Runtime(plugin);
+      expect(plugin.error.calledWith('service.provider.runtime is required!'))
+        .to.equal(true);
+      expect(process.exit.calledOnce).to.equal(true);
+    })
+
+    it('should throw error when invalid runtime', () => {
+      lodashSet(plugin, 'service.provider.runtime', 'invalid');
+      runtimes = new Runtime(plugin);
+      expect(plugin.log.calledWith('"invalid" runtime is not supported (yet).'))
+        .to.equal(true);
+      expect(process.exit.calledOnce).to.equal(true);
+    })
   });
 });

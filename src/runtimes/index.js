@@ -10,6 +10,11 @@ class Runtimes {
 
     const { runtime } = this.plugin.service.provider;
 
+    if (!runtime) {
+      this.plugin.error('service.provider.runtime is required!');
+      return process.exit(1);
+    }
+
     const patterns = {
       python: [/python/, python],
       nodejs: [/node/, nodejs],
@@ -24,17 +29,18 @@ class Runtimes {
     }
 
     if (!this._runtime) {
-      this.plugin.log(`"${runtime}" is not supported (yet).`);
-      process.exit(1);
+      this.plugin.log(`"${runtime}" runtime is not supported (yet).`);
+      return process.exit(1);
     }
 
-    this._runtime.isCompatibleVersion(runtime).then((data) => {
-      if (!data.isCompatible) {
-        this.plugin.error('=============================================================');
-        this.plugin.error(`NOTE: You're currently using incompatible version [${data.version.replace('\n', '')}]`);
-        this.plugin.error('=============================================================\n');
-      }
-    });
+    this._runtime.isCompatibleVersion(runtime)
+      .then((data) => {
+        if (!data.isCompatible) {
+          this.plugin.error('=============================================================');
+          this.plugin.error(`NOTE: You're currently using incompatible version [${data.version.replace('\n', '')}]`);
+          this.plugin.error('=============================================================\n');
+        }
+      });
   }
 
   init() {
