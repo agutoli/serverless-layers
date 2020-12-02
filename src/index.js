@@ -441,8 +441,8 @@ class ServerlessLayers {
     switch (typeof arn) {
       case 'object':
         if (arn.Ref) {
-          text = `logicalId:${chalk.bold('Ref')}:`;
-          text += chalk.magenta(arn.Ref);
+          text = `logicalId:[${chalk.bold('Ref')}=`;
+          text += `${chalk.magenta(arn.Ref)}]`;
         }
         break;
       case 'string':
