@@ -1,4 +1,10 @@
-# 2.3.1 (11-11-23)
+# 2.3.3 (2020-12-02)
+- [Improvement: Layers output beautified](https://github.com/agutoli/serverless-layers/issues/48)
+
+# 2.3.2 (2020-12-02)
+- [Bugfix: TypeError: arn.replace is not a function.](https://github.com/agutoli/serverless-layers/issues/48)
+
+# 2.3.1 (2020-11-23)
 - [Bugfix Error: "undefined" is not supported (yet).](https://github.com/agutoli/serverless-layers/issues/41)
 
 # 2.0.2-alpha (2020-02-23)

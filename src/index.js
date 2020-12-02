@@ -432,15 +432,27 @@ class ServerlessLayers {
   }
 
   logArn(arn) {
-    if (typeof arn !== 'string') {
-      arn = String(arn);
-    }
-
     let pattern = /arn:aws:lambda:([^:]+):([0-9]+):layer:([^:]+):([0-9]+)/g;
     let region = chalk.bold('$1');
     let name = chalk.magenta('$3');
-    let formated = chalk.white(`arn:aws:lambda:${region}:*********:${name}:$4`)
-    return arn.replace(pattern, formated);
+    let formated = chalk.white(`arn:aws:lambda:${region}:*********:${name}:$4`);
+
+    let text = "";
+    switch (typeof arn) {
+      case 'object':
+        if (arn.Ref) {
+          text = `logicalId:${chalk.bold('Ref')}:`;
+          text += chalk.magenta(arn.Ref);
+        }
+        break;
+      case 'string':
+        text = arn;
+        break;
+      default:
+        text = String(arn);
+        break;
+    }
+    return text.replace(pattern, formated);
   }
 }
 
