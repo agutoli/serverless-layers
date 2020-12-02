@@ -432,6 +432,10 @@ class ServerlessLayers {
   }
 
   logArn(arn) {
+    if (typeof arn !== 'string') {
+      arn = String(arn);
+    }
+
     let pattern = /arn:aws:lambda:([^:]+):([0-9]+):layer:([^:]+):([0-9]+)/g;
     let region = chalk.bold('$1');
     let name = chalk.magenta('$3');
