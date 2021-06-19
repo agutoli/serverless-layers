@@ -4,6 +4,7 @@ class AbstractService {
   constructor(plugin) {
     this.plugin = plugin;
 
+    this.functionName = plugin.currentLayerName;
     this.stackName = plugin.getStackName();
     this.layerName = plugin.getLayerName();
     this.bucketName = plugin.getBucketName();

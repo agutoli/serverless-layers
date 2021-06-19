@@ -1,5 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const mkdirp = require('mkdirp');
+const crypto = require('crypto');
+const fsExtra = require('fs-extra');
 const archiver = require('archiver');
 
 const MAX_LAYER_MB_SIZE = 250;
@@ -7,11 +10,60 @@ const MAX_LAYER_MB_SIZE = 250;
 const AbstractService = require('../AbstractService');
 
 class ZipService extends AbstractService {
+  getManifestName(hashName) {
+    return `__meta__/manifest-zip-artifact__${this.functionName}.json`;
+  }
+
+  getChecksum(path) {
+    return new Promise(function (resolve, reject) {
+      const hash = crypto.createHash('md5');
+      const input = fs.createReadStream(path);
+
+      input.on('error', reject);
+
+      input.on('data', function (chunk) {
+        hash.update(chunk);
+      });
+
+      input.on('close', function () {
+        resolve(hash.digest('hex'));
+      });
+    });
+  }
+
+  async hasZipChanged() {
+    const { artifact } = this.plugin.settings;
+    const mName = this.getManifestName(artifact);
+
+    const currentChecksum = await this.getChecksum(artifact);
+    const remoteChecksum = await this.plugin.bucketService.getFile(mName);
+
+    // check if zip hash changed
+    if (remoteChecksum === currentChecksum) {
+      return false;
+    }
+
+    // It updates remote check sum
+    await this.plugin.bucketService.putFile(mName, currentChecksum);
+
+    return true;
+  }
+
   package() {
+    const { compileDir, artifact } = this.plugin.settings;
     const zipFileName = this.plugin.getPathZipFileName();
-    const layersDir = path.join(process.cwd(), this.plugin.settings.compileDir);
+    const layersDir = path.join(process.cwd(), compileDir);
 
     return new Promise((resolve, reject) => {
+      // it's a zip already
+      if (artifact) {
+        // It checks if file exists
+        if (!fs.existsSync(zipFileName)) {
+          throw Error(`Artifact not found "${zipFileName}".`);
+        }
+        return resolve();
+      }    
+  
       const oldCwd = process.cwd();
       const output = fs.createWriteStream(zipFileName);
       const zip = archiver.create('zip');

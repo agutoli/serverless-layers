@@ -220,8 +220,14 @@ class ServerlessLayers {
       hasDepsChanges = await this.runtimes.hasDependenciesChanges();
     }
 
+    let hasZipChanged = false;
+    if (this.settings.artifact) {
+      hasZipChanged = await this.zipService.hasZipChanged();
+    }
+
     // It checks if something has changed
     let verifyChanges = [
+      hasZipChanged,
       hasDepsChanges,
       hasFoldersChanges,
       hasSettingsChanges
@@ -248,13 +254,17 @@ class ServerlessLayers {
      return;
     }
 
-    // ENABLED by default
-    if (this.settings.dependencyInstall) {
-      await this.dependencies.install();
-    }
+    
 
-    if (this.settings.localDir) {
-      await this.localFolders.copyFolders();
+    if (!this.settings.artifact) {
+      // ENABLED by default
+      if (this.settings.dependencyInstall) {
+        await this.dependencies.install();
+      }
+
+      if (this.settings.localDir) {
+        await this.localFolders.copyFolders();
+      }
     }
 
     await this.zipService.package();
@@ -288,6 +298,9 @@ class ServerlessLayers {
   }
 
   getPathZipFileName() {
+    if (this.settings.artifact) {
+      return `${path.join(process.cwd(), this.settings.artifact)}`;
+    }
     return `${path.join(process.cwd(), this.settings.compileDir, this.getLayerName())}.zip`;
   }
 
@@ -318,7 +331,6 @@ class ServerlessLayers {
 
     const outputs = await this.cloudFormationService.getOutputs();
 
-
     if (!outputs) return null;
 
     const logicalId = this.getOutputLogicalId();
@@ -336,7 +348,7 @@ class ServerlessLayers {
   }
 
   mergePackageOptions() {
-    const { packageExclude } = this.settings;
+    const { packageExclude, artifact } = this.settings;
     const pkg = this.service.package;
 
     const opts = {
@@ -352,6 +364,10 @@ class ServerlessLayers {
       if (hasRule === -1) {
         this.service.package.exclude.push(excludeFile);
       }
+    }
+
+    if (artifact) {
+      this.service.package.exclude.push(artifact);
     }
   }
 
