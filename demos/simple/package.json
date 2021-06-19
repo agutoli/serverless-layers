@@ -4,6 +4,6 @@
   "version": "0.1.0",
   "dependencies": {},
   "devDependencies": {
-    "serverless-layers": "../.."
+    "serverless-layers": "agutoli/serverless-layers#master"
   }
 }
