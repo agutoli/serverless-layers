@@ -28,7 +28,7 @@ describe('Runtime', () => {
       })).to.deep.equal(nodejsConfig);
     })
 
-    describe('-> hasDependencesChanged', () => {
+    describe('-> hasDependenciesChanges', () => {
       beforeEach(() => {
         const remoteDeps = JSON.stringify({
           dependencies: {
@@ -55,7 +55,7 @@ describe('Runtime', () => {
       })
 
       it('compares two package json and returns if different', () => {
-        return runtimes._runtime.hasDependencesChanged().then((hasChanged) => {
+        return runtimes._runtime.hasDependenciesChanges().then((hasChanged) => {
           expect(hasChanged).to.equal(true);
         });
       })

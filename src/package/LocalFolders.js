@@ -30,7 +30,7 @@ class LocalFolders extends AbstractService {
     return hashElement(settings.localDir.path, options);
   }
 
-  async hasFoldersChanged() {
+  async hasFoldersChanges() {
     return this.getHash().then((hash) => {
       const manifest = this.getManifestName(hash.name);
       return this.plugin.bucketService.getFile(manifest).then(remoteManifest => {

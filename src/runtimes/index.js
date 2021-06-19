@@ -68,8 +68,8 @@ class Runtimes {
     return this._runtime.commands;
   }
 
-  hasDependencesChanged() {
-    return this._runtime.hasDependencesChanged();
+  hasDependenciesChanges() {
+    return this._runtime.hasDependenciesChanges();
   }
 }
 

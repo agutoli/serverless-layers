@@ -74,7 +74,7 @@ class NodeJSRuntime {
     return hasDifference;
   }
 
-  async hasDependencesChanged() {
+  async hasDependenciesChanges() {
     const remotePackage = await this.plugin.bucketService.downloadDependencesFile();
 
     let isDifferent = true;

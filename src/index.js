@@ -157,7 +157,7 @@ class ServerlessLayers {
     }
   }
 
-  hasSettingsChanged() {
+  hasSettingsChanges() {
     // don't check settings changes twice
     if (this.hasSettingsVerified) {
       return false;
@@ -204,27 +204,27 @@ class ServerlessLayers {
 
     // it avoids issues if user changes some configuration
     // which will not be applied till dependencies be changed
-    let hasSettingsChanged = await this.hasSettingsChanged();
+    let hasSettingsChanges = await this.hasSettingsChanges();
 
     // check if directories content has changed
     // comparing hash md5 remote with local folder
-    let hasFoldersChanged = false;
+    let hasFoldersChanges = false;
     if (this.settings.localDir) {
-      hasFoldersChanged = await this.localFolders.hasFoldersChanged();
+      hasFoldersChanges = await this.localFolders.hasFoldersChanges();
     }
 
     // check if dependencies has changed comparing
     // remote package.json with local one
-    let hasDepsChanged = false;
+    let hasDepsChanges = false;
     if (this.settings.dependencyInstall) {
-      hasDepsChanged = await this.runtimes.hasDependencesChanged();
+      hasDepsChanges = await this.runtimes.hasDependenciesChanges();
     }
 
     // It checks if something has changed
     let verifyChanges = [
-      hasDepsChanged,
-      hasFoldersChanged,
-      hasSettingsChanged
+      hasDepsChanges,
+      hasFoldersChanges,
+      hasSettingsChanges
     ].some(x => x === true);
 
     // merge package default options
@@ -238,7 +238,7 @@ class ServerlessLayers {
 
     /**
      * If no changes, and layer arn available,
-     * it doesn't require re-install dependencies.
+     * it doesn't require re-installing dependencies.
      */
     if (noChanges && existentLayerArn) {
      this.log(`${chalk.inverse.green(' No changes ')}! Using same layer arn: ${this.logArn(existentLayerArn)}`);

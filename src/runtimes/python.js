@@ -58,7 +58,7 @@ class PythonRuntime {
     return depsA !== depsB;
   }
 
-  async hasDependencesChanged() {
+  async hasDependenciesChanges() {
     const remotePackage = await this.plugin.bucketService.downloadDependencesFile();
 
     let isDifferent = true;
