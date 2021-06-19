@@ -234,13 +234,15 @@ class ServerlessLayers {
     const existentLayerArn = await this.getLayerArn();
 
     // It improves readability
-    const noChanges = verifyChanges === false;
+    const skipInstallation = (
+      !verifyChanges && !this.settings.forceInstall && existentLayerArn
+    );
 
     /**
      * If no changes, and layer arn available,
      * it doesn't require re-installing dependencies.
      */
-    if (noChanges && existentLayerArn) {
+    if (skipInstallation) {
      this.log(`${chalk.inverse.green(' No changes ')}! Using same layer arn: ${this.logArn(existentLayerArn)}`);
      this.relateLayerWithFunctions(existentLayerArn);
      return;
