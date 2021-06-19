@@ -129,6 +129,7 @@ class ServerlessLayers {
     return {
       path: '.',
       functions: null,
+      forceInstall: false,
       dependencyInstall: true,
       compileDir: '.serverless',
       customInstallationCommand: null,
@@ -219,16 +220,29 @@ class ServerlessLayers {
       hasDepsChanged = await this.runtimes.hasDependencesChanged();
     }
 
-    // check if something has changed
-    let hasChanged = (!hasFoldersChanged && !hasDepsChanged && !hasSettingsChanged);
+    // It checks if something has changed
+    let verifyChanges = [
+      hasDepsChanged,
+      hasFoldersChanged,
+      hasSettingsChanged
+    ].some(x => x === true);
 
     // merge package default options
     this.mergePackageOptions();
 
-    const currentLayerARN = await this.getLayerArn();
-    if (hasChanged && currentLayerARN) {
-     this.log(`${chalk.inverse.green(' No changes ')}! Using same layer arn: ${this.logArn(currentLayerARN)}`);
-     this.relateLayerWithFunctions(currentLayerARN);
+    // It returns the layer arn if exists.
+    const existentLayerArn = await this.getLayerArn();
+
+    // It improves readability
+    const noChanges = verifyChanges === false;
+
+    /**
+     * If no changes, and layer arn available,
+     * it doesn't require re-install dependencies.
+     */
+    if (noChanges && existentLayerArn) {
+     this.log(`${chalk.inverse.green(' No changes ')}! Using same layer arn: ${this.logArn(existentLayerArn)}`);
+     this.relateLayerWithFunctions(existentLayerArn);
      return;
     }
 
