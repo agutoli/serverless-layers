@@ -45,7 +45,7 @@ class ZipService extends AbstractService {
     }
 
     // It updates remote check sum
-    this.plugin.log(`${chalk.inverse.yellow(' Artifact changed ')}!`);
+    this.plugin.log(`${chalk.inverse.yellow(' Artifact changed ')}! Checksum=${currentChecksum}`);
     await this.plugin.bucketService.putFile(mName, currentChecksum);
 
     return true;
