@@ -192,9 +192,17 @@ class ServerlessLayers {
   }
 
   async main() {
+    const {
+      arn,
+      localDir,
+      artifact,
+      forceInstall,
+      dependencyInstall
+    } = this.settings;
+
     // static ARN
-    if (this.settings.arn) {
-      this.relateLayerWithFunctions(this.settings.arn);
+    if (arn) {
+      this.relateLayerWithFunctions(arn);
       return;
     }
 
@@ -209,19 +217,19 @@ class ServerlessLayers {
     // check if directories content has changed
     // comparing hash md5 remote with local folder
     let hasFoldersChanges = false;
-    if (this.settings.localDir) {
+    if (localDir) {
       hasFoldersChanges = await this.localFolders.hasFoldersChanges();
     }
 
     // check if dependencies has changed comparing
     // remote package.json with local one
     let hasDepsChanges = false;
-    if (this.settings.dependencyInstall) {
+    if (dependencyInstall) {
       hasDepsChanges = await this.runtimes.hasDependenciesChanges();
     }
 
     let hasZipChanged = false;
-    if (this.settings.artifact) {
+    if (artifact) {
       hasZipChanged = await this.zipService.hasZipChanged();
     }
 
@@ -241,7 +249,7 @@ class ServerlessLayers {
 
     // It improves readability
     const skipInstallation = (
-      !verifyChanges && !this.settings.forceInstall && existentLayerArn
+      !verifyChanges && !forceInstall && existentLayerArn
     );
 
     /**
@@ -254,17 +262,13 @@ class ServerlessLayers {
      return;
     }
 
-    
+    // ENABLED by default
+    if (dependencyInstall && !artifact) {
+      await this.dependencies.install();
+    }
 
-    if (!this.settings.artifact) {
-      // ENABLED by default
-      if (this.settings.dependencyInstall) {
-        await this.dependencies.install();
-      }
-
-      if (this.settings.localDir) {
-        await this.localFolders.copyFolders();
-      }
+    if (localDir && !artifact) {
+      await this.localFolders.copyFolders();
     }
 
     await this.zipService.package();

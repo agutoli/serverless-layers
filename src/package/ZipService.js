@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const chalk = require('chalk');
 const mkdirp = require('mkdirp');
 const crypto = require('crypto');
 const fsExtra = require('fs-extra');
@@ -44,6 +45,7 @@ class ZipService extends AbstractService {
     }
 
     // It updates remote check sum
+    this.plugin.log(`${chalk.inverse.yellow(' Artifact changed ')}!`);
     await this.plugin.bucketService.putFile(mName, currentChecksum);
 
     return true;
