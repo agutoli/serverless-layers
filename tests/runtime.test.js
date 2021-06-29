@@ -1,10 +1,10 @@
 const { expect } = require('chai');
-const lodashSet = require('lodash.set')
+const lodashSet = require('lodash.set');
 const sinon = require('sinon');
 const Runtime = require('runtimes');
 
-const nodejsConfig = require('./fixtures/nodejsConfig')
-const pythonConfig = require('./fixtures/pythonConfig')
+const nodejsConfig = require('./fixtures/nodejsConfig');
+const pythonConfig = require('./fixtures/pythonConfig');
 
 describe('Runtime', () => {
   describe('-> NodeJs', () => {
@@ -26,7 +26,7 @@ describe('Runtime', () => {
         packageManager: 'yarn',
         dependenciesPath: './fixtures/package.json'
       })).to.deep.equal(nodejsConfig);
-    })
+    });
 
     describe('-> hasDependenciesChanges', () => {
       beforeEach(() => {
@@ -34,31 +34,32 @@ describe('Runtime', () => {
           dependencies: {
             express: '1.2.3'
           }
-        })
+        });
 
         lodashSet(plugin, 'bucketService.downloadDependencesFile', () => Promise.resolve(remoteDeps));
 
         plugin.settings = runtimes.getDefaultSettings({
           packageManager: 'yarn',
-          dependenciesPath: './tests/fixtures/package.json'
-        })
-        runtimes.init()
+          dependenciesPath: './tests/fixtures/package.json',
+          dependenciesLockPath: './tests/fixtures/package-lock.json'
+        });
+        runtimes.init();
       });
 
       it('checks if version is compatible', () => {
         return runtimes._runtime.isCompatibleVersion('v12.16').then((res) => {
           expect(res.isCompatible).to.equal(true);
         })
-        .then(() => runtimes._runtime.isCompatibleVersion('v12.18.3').then((res) => {
-          expect(res.isCompatible).to.equal(true);
-        }));
-      })
+          .then(() => runtimes._runtime.isCompatibleVersion('v12.18.3').then((res) => {
+            expect(res.isCompatible).to.equal(true);
+          }));
+      });
 
       it('compares two package json and returns if different', () => {
         return runtimes._runtime.hasDependenciesChanges().then((hasChanged) => {
           expect(hasChanged).to.equal(true);
         });
-      })
+      });
     });
   });
 
@@ -80,7 +81,7 @@ describe('Runtime', () => {
       expect(plugin.error.calledWith('service.provider.runtime is required!'))
         .to.equal(true);
       expect(process.exit.calledOnce).to.equal(true);
-    })
+    });
 
     it('should throw error when invalid runtime', () => {
       lodashSet(plugin, 'service.provider.runtime', 'invalid');
@@ -88,6 +89,6 @@ describe('Runtime', () => {
       expect(plugin.log.calledWith('"invalid" runtime is not supported (yet).'))
         .to.equal(true);
       expect(process.exit.calledOnce).to.equal(true);
-    })
+    });
   });
 });

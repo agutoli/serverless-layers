@@ -11,6 +11,7 @@ class NodeJSRuntime {
       libraryFolder: 'node_modules',
       packageManager:  'npm',
       dependenciesPath: 'package.json',
+      dependenciesLockPath: 'package-lock.json',
       compatibleRuntimes: [runtimeDir],
       copyBeforeInstall: [
         '.npmrc',
@@ -29,19 +30,29 @@ class NodeJSRuntime {
   }
 
   init() {
-    const { dependenciesPath } = this.plugin.settings;
+    const { dependenciesPath, dependenciesLockPath } = this.plugin.settings;
 
     const localpackageJson = path.join(
       process.cwd(),
       dependenciesPath
     );
 
+    const localpackageLockJson = path.join(
+      process.cwd(),
+      dependenciesLockPath
+    );
+
     try {
       this.localPackage = require(localpackageJson);
     } catch (e) {
-      this.plugin.log(`Error: Can not find ${localpackageJson}!`);
+      this.plugin.log(`Error: Can not find ${localpackageJson} or ${localpackageLockJson}!`);
       process.exit(1);
     }
+
+    try {
+      this.localPackageLock = require(localpackageLockJson);
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
   }
 
   async isCompatibleVersion(runtime) {
@@ -81,9 +92,31 @@ class NodeJSRuntime {
 
     if (remotePackage) {
       const parsedRemotePackage = JSON.parse(remotePackage);
-      const { dependencies } = parsedRemotePackage;
+      const { dependencies, version } = parsedRemotePackage;
       this.plugin.log('Comparing package.json dependencies...');
-      isDifferent = await this.isDiff(dependencies, this.localPackage.dependencies);
+      const isDifferentPackageJson = await
+      this.isDiff(dependencies, this.localPackage.dependencies);
+
+      let isDifferentPackageLock = false;
+
+      if (this.localPackageLock) {
+        console.log(this.localPackageLock)
+        const { dependenciesLockPath } = this.plugin.settings;
+        const remotePackageLock = await this.plugin.bucketService.getFile(dependenciesLockPath);
+        const parsedRemotePackageLock = JSON.parse(remotePackageLock);
+        const lockDependencies = parsedRemotePackageLock.dependencies
+          .filter((dependency) => dependency.dev !== true);
+        const localLockDependencies = this.localPackageLock.dependencies
+          .filter((dependency) => dependency.dev !== true);
+        isDifferentPackageLock = true;
+        if (remotePackageLock) {
+          isDifferentPackageLock = await
+          this.isDiff(lockDependencies, localLockDependencies);
+        }
+      }
+      isDifferent = version !== this.localPackage.version
+        || isDifferentPackageJson
+        || isDifferentPackageLock;
     }
 
     return isDifferent;
