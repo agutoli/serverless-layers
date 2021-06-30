@@ -100,18 +100,21 @@ class NodeJSRuntime {
       let isDifferentPackageLock = false;
 
       if (this.localPackageLock) {
-        console.log(this.localPackageLock);
         const { dependenciesLockPath } = this.plugin.settings;
         const remotePackageLock = await this.plugin.bucketService.getFile(dependenciesLockPath);
         if (remotePackageLock) {
           const parsedRemotePackageLock = JSON.parse(remotePackageLock);
-          const lockDependencies = parsedRemotePackageLock.dependencies
-            .filter((dependency) => dependency.dev !== true);
-          const localLockDependencies = this.localPackageLock.dependencies
-            .filter((dependency) => dependency.dev !== true);
+          const lockDependencies = Object.fromEntries(
+            Object.entries(parsedRemotePackageLock.dependencies)
+              .filter((dependency) => dependency[1].dev !== true)
+          );
+          const localLockDependencies = Object.fromEntries(
+            Object.entries(this.localPackageLock.dependencies)
+              .filter((dependency) => dependency[1].dev !== true)
+          );
 
-          isDifferentPackageLock = await
-          this.isDiff(lockDependencies, localLockDependencies);
+          isDifferentPackageLock = JSON.stringify(lockDependencies)
+            !== JSON.stringify(localLockDependencies);
         } else {
           isDifferentPackageLock = true;
         }
