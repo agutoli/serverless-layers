@@ -103,7 +103,7 @@ functions:
 
 |     Option     |    Type   |   Default   | Description |
 | -------------- | --------- | ----------- | ----------- |
-| packageManager |  `string` |    npm      | Possible values: npm, yarn |
+| packageManager |  `string` |    npm      | Possible values: npm, yarn, pnpm |
 | packagePath    |  `string` | package.json | `(DEPRECATED)`: Available for `<= 1.5.0`, for versions `>= 2.x` please use `compatibleRuntimes` |
 | dependenciesPath   |  `string` | package.json | Note: `>= 2.x` versions. You can specify custom path for your package.json |
 | compatibleRuntimes |  `array` | `['nodejs']` | Possible values: nodejs, nodejs10.x, nodejs12.x |
