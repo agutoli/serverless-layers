@@ -6,7 +6,7 @@ class CloudFormationService extends AbstractService {
       StackName: this.stackName
     };
 
-    return this.provider.request('CloudFormation', 'describeStacks', params)
+    return this.awsRequest('CloudFormation:describeStacks', params)
       .then(({ Stacks }) => Stacks && Stacks[0].Outputs)
       .catch(() => []);
   }

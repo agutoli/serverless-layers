@@ -12,15 +12,11 @@ class LayersService extends AbstractService {
       CompatibleRuntimes: this.plugin.settings.compatibleRuntimes
     };
 
-    return this.provider.request('Lambda', 'publishLayerVersion', params)
+    return this.awsRequest('Lambda:publishLayerVersion', params, { checkError: true })
       .then((result) => {
         this.plugin.log('New layer version published...');
         this.plugin.cacheObject.LayerVersionArn = result.LayerVersionArn;
         return result;
-      })
-      .catch(e => {
-        console.log(e.message);
-        process.exit(1);
       });
   }
 
@@ -29,7 +25,7 @@ class LayersService extends AbstractService {
       LayerName: this.layerName
     };
 
-    const response = await this.provider.request('Lambda', 'listLayerVersions', params);
+    const response = await this.awsRequest('Lambda:listLayerVersions', params, { checkError: true });
 
     if (response.LayerVersions.length === 0) {
       this.plugin.log('Layers removal finished.');
@@ -38,10 +34,10 @@ class LayersService extends AbstractService {
 
     const deleteQueue = response.LayerVersions.map((layerVersion) => {
       this.plugin.log(`Removing layer version: ${layerVersion.Version}`);
-      return this.provider.request('Lambda', 'deleteLayerVersion', {
+      return this.awsRequest('Lambda:deleteLayerVersion', {
         LayerName: this.layerName,
         VersionNumber: layerVersion.Version
-      });
+      }, { checkError: true });
     });
 
     await Promise.all(deleteQueue);
