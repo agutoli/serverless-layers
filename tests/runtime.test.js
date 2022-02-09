@@ -43,9 +43,11 @@ describe('Runtime', () => {
           dependenciesPath: './tests/fixtures/package.json'
         })
         runtimes.init()
+        runtimes._runtime.parent.run = () => 'v12.20.1';
       });
 
       it('checks if version is compatible', () => {
+        
         return runtimes._runtime.isCompatibleVersion('v12.16').then((res) => {
           expect(res.isCompatible).to.equal(true);
         })
