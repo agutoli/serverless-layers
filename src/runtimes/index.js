@@ -33,6 +33,7 @@ class Runtimes {
       return process.exit(1);
     }
 
+    console.log('runtime::::', { runtime });
     this._runtime.isCompatibleVersion(runtime)
       .then((data) => {
         if (!data.isCompatible) {

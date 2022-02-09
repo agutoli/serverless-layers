@@ -2,6 +2,7 @@ module.exports = {
   runtime: 'nodejs12.x',
   runtimeDir: 'nodejs',
   packageManager: 'yarn',
+  packageManagerExtraArgs: '',
   libraryFolder: 'node_modules',
   dependenciesPath: './fixtures/package.json',
   compatibleRuntimes: [ 'nodejs' ],
