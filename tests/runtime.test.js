@@ -12,8 +12,8 @@ describe('Runtime', () => {
     let runtimes;
     beforeEach(() => {
       plugin = {
-        log: sinon.mock(),
-        error: sinon.mock(),
+        log: sinon.stub(),
+        error: sinon.stub(),
       };
 
       lodashSet(plugin, 'service.provider.runtime', 'nodejs12.x');
