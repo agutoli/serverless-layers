@@ -12,6 +12,7 @@ class RubyRuntime {
       runtimeDir,
       libraryFolder: 'gems',
       packageManager:  'bundle',
+      packageManagerExtraArgs: '',
       dependenciesPath: 'Gemfile',
       compatibleRuntimes: [runtime],
       copyBeforeInstall: [

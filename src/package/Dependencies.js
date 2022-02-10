@@ -85,7 +85,10 @@ class Dependencies extends AbstractService {
       console.log(chalk.white(await this.run(this.plugin.settings.customInstallationCommand)));
     } else {
       const commands = this.plugin.runtimes.getCommands();
-      console.log(chalk.white(await this.run(commands[this.plugin.settings.packageManager])));
+      const {packageManagerExtraArgs, packageManager} = this.plugin.settings;
+      const installCommand = `${commands[packageManager]} ${packageManagerExtraArgs}`;
+      this.plugin.log(chalk.white.bold(installCommand));
+      console.log(chalk.white(await this.run(installCommand)));
     }
 
     for (const index in copyAfterInstall) {

@@ -12,8 +12,8 @@ describe('Runtime', () => {
     let runtimes;
     beforeEach(() => {
       plugin = {
-        log: sinon.mock(),
-        error: sinon.mock(),
+        log: sinon.stub(),
+        error: sinon.stub(),
       };
 
       lodashSet(plugin, 'service.provider.runtime', 'nodejs12.x');
@@ -43,9 +43,11 @@ describe('Runtime', () => {
           dependenciesPath: './tests/fixtures/package.json'
         })
         runtimes.init()
+        runtimes._runtime.parent.run = () => 'v12.20.1';
       });
 
       it('checks if version is compatible', () => {
+        
         return runtimes._runtime.isCompatibleVersion('v12.16').then((res) => {
           expect(res.isCompatible).to.equal(true);
         })
