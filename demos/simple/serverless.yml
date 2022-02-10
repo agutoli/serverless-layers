@@ -10,6 +10,7 @@ provider:
 custom:
   serverless-layers:
     dependenciesPath: requirements.txt
+    packageManagerExtraArgs: '--no-color'
     compatibleRuntimes: ["python3.8"]
 
 functions:

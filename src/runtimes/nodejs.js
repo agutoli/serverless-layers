@@ -10,6 +10,7 @@ class NodeJSRuntime {
       runtimeDir,
       libraryFolder: 'node_modules',
       packageManager:  'npm',
+      packageManagerExtraArgs: '',
       dependenciesPath: 'package.json',
       compatibleRuntimes: [runtimeDir],
       copyBeforeInstall: [
