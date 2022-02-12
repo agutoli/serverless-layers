@@ -381,6 +381,22 @@ class ServerlessLayers {
     const funcs = this.settings.functions;
     const cliOpts = this.provider.options;
 
+    if (!funcs || !functions || funcs.length === functions.length) {
+      // if we are not specifying functions
+      // or if the service has no functions
+      // or we are specifying all functions of the service
+      // then add the layer to providers
+      if (this.service.provider.layers) {
+        this.service.provider.layers.push(layerArn);
+      } else {
+        this.service.provider.layers = [layerArn];
+      }
+      this.log(
+        `${chalk.magenta.bold('provider')} - ${this.logArn(layerArn)}`,
+        ' ✓'
+      );
+    }
+
     Object.keys(functions).forEach(funcName => {
       if (cliOpts.function && cliOpts.function !== funcName) {
         return;
@@ -392,13 +408,16 @@ class ServerlessLayers {
         isEnabled = true;
       }
 
-      if (isEnabled) {
+      if (isEnabled && functions[funcName].layers) {
+        // if this function has other layers add ours too so it applies
         functions[funcName].layers = functions[funcName].layers || [];
         functions[funcName].layers.push(layerArn);
         functions[funcName].layers = Array.from(new Set(functions[funcName].layers));
         this.log(`function.${chalk.magenta.bold(funcName)} - ${this.logArn(layerArn)}`, ' ✓');
       } else {
-        this.warn(`(Skipped) function.${chalk.magenta.bold(funcName)}`, ` x`);
+        // otherwise please skip this function so the provider.layers can take care of it
+        const noLayersMessage = functions[funcName].layers ? '' : ' - because it has no other layers'
+        this.warn(`(Skipped) function.${chalk.magenta.bold(funcName)}${noLayersMessage}`, ` x`);
       }
     });
 

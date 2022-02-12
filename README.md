@@ -5,7 +5,8 @@
 [![Build Status](https://travis-ci.org/agutoli/serverless-layers.svg?branch=master)](https://travis-ci.org/agutoli/serverless-layers)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 ![Node.js CI](https://github.com/agutoli/serverless-layers/workflows/Node.js%20CI/badge.svg)
-* It attaches automatically layers for each function
+* It attaches automatically layers to the provider and for each function
+    * it will skip functions with no other layers as they will use the layer(s) we added to the provider
 * It creates a new layer's version when `dependencies` is updated
 * If `dependencies` is not changed, it does not publish a new layer
 * It reduces drastically lambda size
