@@ -1,6 +1,6 @@
 {
   "name": "serverless-layers",
-  "version": "2.5.2-beta.2",
+  "version": "2.5.3",
   "description": "",
   "main": "lib/index.js",
   "bugs": {
