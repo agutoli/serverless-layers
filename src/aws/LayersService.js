@@ -12,6 +12,7 @@ class LayersService extends AbstractService {
       CompatibleRuntimes: this.plugin.settings.compatibleRuntimes,
       CompatibleArchitectures: this.plugin.settings.compatibleArchitectures
     };
+    console.log({ params });
 
     return this.awsRequest('Lambda:publishLayerVersion', params, { checkError: true })
       .then((result) => {
