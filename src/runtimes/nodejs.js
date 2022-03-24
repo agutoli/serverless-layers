@@ -11,7 +11,7 @@ class NodeJSRuntime {
       libraryFolder: 'node_modules',
       packageManager:  'npm',
       dependenciesPath: 'package.json',
-      dependenciesLockPath: 'package-lock.json',
+      dependenciesLockPath: 'yarn.lock',
       compatibleRuntimes: [runtimeDir],
       copyBeforeInstall: [
         '.npmrc',
