@@ -7,6 +7,7 @@ const python = require('./python');
 class Runtimes {
   constructor(plugin) {
     this.plugin = plugin;
+    this.compatibleArchitectures = ["x86_64","arm64"];
 
     const { runtime } = this.plugin.service.provider;
 
