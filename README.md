@@ -196,3 +196,12 @@ We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/jav
 ## License
 
 MIT
+
+## Contributors
+<!-- Copy-paste in your Readme.md file -->
+
+<a href="https://github.com/agutoli/serverless-layers/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=agutoli/serverless-layers" />
+</a>
+
+Made with [contributors-img](https://contrib.rocks).
