@@ -185,19 +185,17 @@ This plugin will setup follow options automatically if not specified at `serverl
 }
 ```
 
+## License
 
-## Contributing
+MIT
+
+## Contributors
 
 Yes, thank you!
 This plugin is community-driven, most of its features are from different authors.
 Please update the docs and tests and add your name to the package.json file.
 We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript).
 
-## License
-
-MIT
-
-## Contributors
 <!-- Copy-paste in your Readme.md file -->
 
 <a href="https://github.com/agutoli/serverless-layers/graphs/contributors">
