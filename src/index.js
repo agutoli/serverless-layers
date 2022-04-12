@@ -190,6 +190,34 @@ class ServerlessLayers {
     });
   }
 
+  async hasCustomHashChanged() {
+    if (!this.settings.customHash) {
+      return false;
+    }
+
+    const hashFileName = 'customHash.json';
+    const remoteHashFile = await this.bucketService.getFile(hashFileName);
+
+    if (!remoteHashFile) {
+      this.log('no previous custom hash found, putting new remote hash');
+      await this.plugin.bucketService.putFile(
+        hashFileName, JSON.stringify({ hash: this.settings.customHash })
+      );
+      return true;
+    }
+
+    const remoteHash = remoteHashFile.hash;
+    if (remoteHash === this.settings.customHash) {
+      return false;
+    }
+
+    await this.plugin.bucketService.putFile(
+      hashFileName, JSON.stringify({ hash: this.settings.customHash })
+    );
+    this.log('identified custom hash change!');
+    return true;
+  }
+
   async main() {
     const {
       arn,
@@ -232,12 +260,15 @@ class ServerlessLayers {
       hasZipChanged = await this.zipService.hasZipChanged();
     }
 
+    const hashCustomHashChanged = await this.hasCustomHashChanged();
+
     // It checks if something has changed
     const verifyChanges = [
       hasZipChanged,
       hasDepsChanges,
       hasFoldersChanges,
-      hasSettingsChanges
+      hasSettingsChanges,
+      hashCustomHashChanged
     ].some(x => x === true);
 
     // merge package default options
