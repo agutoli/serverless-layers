@@ -261,7 +261,7 @@ class ServerlessLayers {
       hasZipChanged = await this.zipService.hasZipChanged();
     }
 
-    const hashCustomHashChanged = await this.hasCustomHashChanged();
+    const hasCustomHashChanged = await this.hasCustomHashChanged();
 
     // It checks if something has changed
     let verifyChanges = [
@@ -269,7 +269,7 @@ class ServerlessLayers {
       hasDepsChanges,
       hasFoldersChanges,
       hasSettingsChanges,
-      hashCustomHashChanged
+      hasCustomHashChanged
     ].some(x => x === true);
 
     // merge package default options
