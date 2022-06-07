@@ -21,19 +21,21 @@ class LayersService extends AbstractService {
       });
   }
 
-  async cleanUpLayers() {
+  async cleanUpLayers(keepVersion = 0) {
     const params = {
       LayerName: this.layerName
     };
 
     const response = await this.awsRequest('Lambda:listLayerVersions', params, { checkError: true });
 
-    if (response.LayerVersions.length === 0) {
-      this.plugin.log('Layers removal finished.');
+    if (response.LayerVersions.length <= keepVersion) {
+      this.plugin.log('Layers removal finished.\n');
       return;
     }
 
-    const deleteQueue = response.LayerVersions.map((layerVersion) => {
+    const deletionCandidates = this.selectVersionsToDelete(response.LayerVersions, keepVersion);
+
+    const deleteQueue = deletionCandidates.map((layerVersion) => {
       this.plugin.log(`Removing layer version: ${layerVersion.Version}`);
       return this.awsRequest('Lambda:deleteLayerVersion', {
         LayerName: this.layerName,
@@ -43,7 +45,13 @@ class LayersService extends AbstractService {
 
     await Promise.all(deleteQueue);
 
-    await this.cleanUpLayers();
+    await this.cleanUpLayers(keepVersion);
+  }
+
+  selectVersionsToDelete(versions, keepVersion) {
+    return versions
+      .sort((a, b) => parseInt(a.Version) === parseInt(b.Version) ? 0 : parseInt(a.Version) > parseInt(b.Version) ? -1 : 1)
+      .slice(keepVersion);
   }
 }
 

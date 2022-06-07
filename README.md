@@ -91,6 +91,7 @@ functions:
 | compileDir     |  `string` | .serverless | Compilation directory |
 | layersDeploymentBucket | `string` |  | You can specify a bucket to upload lambda layers. `Required if deploymentBucket is not defined.` |
 | customInstallationCommand | `string` |  | It specify a custom command to install deps ex. `MY_ENV=1 npm --proxy http://myproxy.com i -P` |
+| keepVersion | `int` |  | Number of layer versions to keep, the rest versions will be removed after deployments |
 
 
 ## NodeJS
