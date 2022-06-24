@@ -129,14 +129,14 @@ class ServerlessLayers {
         continue;
       }
 
-      if (!currentSettings.keepVersion) {
+      if (!currentSettings.retainVersions) {
         continue;
       }
 
       this.log('Cleaning up layer versions...');
 
       await this.initServices(layerName, currentSettings);
-      await this.cleanUpLayers(currentSettings.keepVersion);
+      await this.cleanUpLayers(currentSettings.retainVersions);
     }
   }
 
@@ -509,8 +509,8 @@ class ServerlessLayers {
     console.log('...' + chalk.red(`${signal} ${chalk.white.bold(msg)}`));
   }
 
-  cleanUpLayers(keepVersion) {
-    return this.layersService.cleanUpLayers(keepVersion);
+  cleanUpLayers(retainVersions) {
+    return this.layersService.cleanUpLayers(retainVersions);
   }
 
   logArn(arn) {
