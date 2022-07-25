@@ -7,7 +7,7 @@
     "start": "tsc -h",
     "build": "tsc --pretty --outDir ./dist",
     "test": "jest",
-    "test:watch": "jest --watch",
+    "test:watch": "jest --watch --detectOpenHandles",
     "docs": "typedoc --out docs src/*.ts",
     "lint": "eslint -f unix \"src/**/*.{ts,tsx}\"",
     "dev:watch": "nodemon -e ts --watch ./src --exec 'yarn build'"
