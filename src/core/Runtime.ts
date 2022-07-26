@@ -1,8 +1,7 @@
 import Err from './errors';
 
-import {NSLayerConfig, LayerConfig} from './LayerConfig';
-import {IServerlessFacade} from './Facade';
-import {IRuntimeAdapter} from '../runtimes/Adapter';
+import {LayerConfig} from './LayerConfig';
+
 
 export class RuntimeResolver {
   // Runtime string defined at

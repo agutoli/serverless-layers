@@ -1,14 +1,15 @@
-import Serverless from 'serverless';
-import Plugin from 'serverless/classes/Plugin';
+import type Serverless from 'serverless';
+
+import type Plugin from 'serverless/classes/Plugin';
 
 import {State} from './core/State';
 import {RuntimeResolver} from './core/Runtime';
-import {NSLayerConfig, LayerConfig} from './core/LayerConfig';
-import {IServerlessFacade, ServerlessFacade} from './core/Facade';
 
+import {LayerConfig} from './core/LayerConfig';
+import {ServerlessFacade} from './core/Facade';
 
 // runtime adapters
-import {IRuntimeAdapter, RuntimeAdapter} from './runtimes/Adapter';
+import {RuntimeAdapter} from './runtimes/Adapter';
 
 import {RubyRuntimeAdapter} from './runtimes/RubyAdapter';
 import {NodeJsRuntimeAdapter} from './runtimes/NodeJsAdapter';

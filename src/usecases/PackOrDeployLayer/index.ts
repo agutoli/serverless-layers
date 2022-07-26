@@ -1,8 +1,5 @@
 import {State} from '../../core/State';
-import {System} from '../../core/System';
-import {IServerlessFacade} from '../../core/Facade';
 import {LayerConfig} from '../../core/LayerConfig';
-import {IRuntimeAdapter} from '../../runtimes/Adapter';
 
 // auxiliar usecases
 import * as AddLayerToServerless from './AddLayerToServerless';

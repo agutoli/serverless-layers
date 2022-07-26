@@ -1,4 +1,3 @@
-import {IServerlessFacade} from '../../core/Facade';
 import {LayerConfig} from '../../core/LayerConfig';
 
 export function layersDeployUseCase(

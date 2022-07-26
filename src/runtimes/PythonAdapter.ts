@@ -1,7 +1,6 @@
 import Err from '../core/errors';
 
-import {NSLayerConfig} from '../core/LayerConfig';
-import {RuntimeAdapter, IRuntimeAdapter} from './Adapter';
+import {RuntimeAdapter} from './Adapter';
 
 export class PythonRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdapter {
   // @public

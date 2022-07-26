@@ -1,5 +1,3 @@
-import {IServerlessFacade} from '../../core/Facade';
-
 type Injection = {
   facade: IServerlessFacade
 };

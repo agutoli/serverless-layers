@@ -1,5 +1,5 @@
 import Err from './errors';
-import {IServerlessFacade} from './Facade';
+
 import {LayerConfig} from './LayerConfig';
 
 export class State {

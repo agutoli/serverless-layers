@@ -10,7 +10,7 @@
     "test:watch": "jest --watch --detectOpenHandles",
     "docs": "typedoc --out docs src/*.ts",
     "lint": "eslint -f unix \"src/**/*.{ts,tsx}\"",
-    "dev:watch": "nodemon -e ts --watch ./src --exec 'yarn build'"
+    "dev:watch": "nodemon -e ts --watch ./src --exec 'yarn build && yarn lint'"
   },
   "author": "",
   "license": "ISC",
