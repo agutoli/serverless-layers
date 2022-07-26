@@ -3,9 +3,9 @@ import path from 'path';
 export class LayerConfig {
   arn?: string;
 
-  _config: NSLayerConfig.CustomConfigs;
+  _config: Config.CustomConfigs;
 
-  constructor(configHey: string, _config: any) {
+  constructor(configHey: string, _config: Config.CustomConfigs) {
     this._config = Object.assign({
       path: process.cwd(),
       functions: null,
@@ -21,24 +21,27 @@ export class LayerConfig {
     Object.assign(this, this._config);
   }
 
-  get(key: string): any {
-    return (this._config as any)[key];
+  get<T>(key: string): T {
+    return (this._config[key as Config.CustomConfigsKey] as unknown) as T;
   }
 
   layerPackagePath(): string {
     return path.join(
-      this.get('path'),
-      this.get('compileDir'), 'layers', this.get('runtimeDir')
+      this.get<string>('path'),
+      this.get<string>('compileDir'),
+      'layers',
+      this.get<string>('runtimeDir')
     );
   }
 
   dependencyAbsPath(): string {
     return path.resolve(
-      path.join(this.get('path'), this.get('dependenciesPath'))
-    );
+      path.join(this.get('path') as string,
+      this.get<string>('dependenciesPath')
+    ));
   }
 
-  toJSON(): NSLayerConfig.CustomConfigs {
+  toJSON(): Config.CustomConfigs {
     return this._config;
   }
 }
