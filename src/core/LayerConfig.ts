@@ -36,9 +36,11 @@ export class LayerConfig {
 
   dependencyAbsPath(): string {
     return path.resolve(
-      path.join(this.get('path') as string,
-      this.get<string>('dependenciesPath')
-    ));
+      path.join(
+        this.get<string>('path'),
+        this.get<string>('dependenciesPath')
+      )
+    );
   }
 
   toJSON(): Config.CustomConfigs {

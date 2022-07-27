@@ -44,9 +44,13 @@ describe('LayerConfig', () => {
       const result = createConfiguration({
         runtime: "nodejs14.x",
         deploymentBucketName: 'my-test-bucket',
-        customConfigs: {
-          path: '/app'
-        }
+        customConfigs: [
+          {
+            default: {
+              path: '/app'
+            }
+          }
+        ]
       });
       facade = result.facade;
       runtime = result.runtime;
@@ -100,9 +104,13 @@ describe('LayerConfig', () => {
       const result = createConfiguration({
         runtime: "ruby2.7",
         deploymentBucketName: 'my-test-bucket',
-        customConfigs: {
-          path: '/app'
-        }
+        customConfigs: [
+          {
+            default: {
+              path: '/app'
+            }
+          }
+        ]
       });
       facade = result.facade;
       runtime = result.runtime;

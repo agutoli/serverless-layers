@@ -5,7 +5,7 @@ export const mocksInit = {
       awsRequest: jest.fn(),
       getFunctions: jest.fn(),
       attachLayerByArn: jest.fn(),
-      getCustomConfigs: jest.fn(() => opts.customConfigs),
+      getCustomConfigs: jest.fn(() => opts.customConfigs || []),
       defineCustomProperties: jest.fn(),
       getServerlessVersion: jest.fn(() => opts.serverlessVersion),
       getDeploymentBucketName: jest.fn(() => {

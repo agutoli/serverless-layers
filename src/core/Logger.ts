@@ -1,5 +1,1 @@
-export class Logger {
-  constructor() {
-
-  }
-}
+export class Logger {}

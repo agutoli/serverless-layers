@@ -1,5 +1,3 @@
-import Err from './errors';
-
 import {LayerConfig} from './LayerConfig';
 
 export class State {

@@ -4,7 +4,7 @@ import {RuntimeAdapter} from './Adapter';
 
 export class PythonRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdapter {
   // @public
-  readonly runtimeId: NSLayerConfig.RuntimeIds = 'python';
+  readonly runtimeId: Config.RuntimeIds = 'python';
 
   readonly defaultConfig = {
     packageManager: 'pip',
@@ -22,7 +22,7 @@ export class PythonRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdap
   }
 
   readonly commands = {
-    pip: (x:  NSLayerConfig.IPython) => `pip install -r ${x.dependenciesPath} -t .`
+    pip: (x:  Config.IPython) => `pip install -r ${x.dependenciesPath} -t .`
   }
 
   async hasDependenciesDiff(): Promise<boolean> {

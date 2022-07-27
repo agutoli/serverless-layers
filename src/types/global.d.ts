@@ -1,6 +1,14 @@
-interface KeyValue {
-  [key: string]: any;
+type KeyValue<T> = {
+  [key: string]: T;
 }
+
+type ValueOf<T> = T[keyof T]
+
+type Entries<T> = {
+  [K in keyof T]: [K, T[K]];
+}[keyof T][];
+
+type Test = Entries<Obj>;
 
 interface IServerlessFacade {
   getRuntime(): string | undefined;
@@ -8,15 +16,15 @@ interface IServerlessFacade {
   awsRequest(serviceAction: string, params: unknown, opts: unknown): Promise<unknown>;
   attachLayerByArn(arn: string): void;
   getServerlessVersion(): string;
-  getCustomConfigs(): NSLayerConfig.CustomConfigs;
+  getCustomConfigs(): KeyValue<Config.CustomConfigs>[];
   defineCustomProperties(properties: KeyValue): void;
   getDeploymentBucketName(): string | undefined;
 }
 
 interface IRuntimeAdapter {
-  readonly runtimeId: NSLayerConfig.RuntimeIds;
+  readonly runtimeId: Config.RuntimeIds;
   readonly defaultConfig: {[key: string]: unknown};
-  loadLayersConfig(config: any): void;
+  loadLayersConfig(config: LayerConfig): void;
   getLayersConfig(): LayerConfig[];
   hasDependenciesDiff(): Promise<boolean>;
   isCompatibleVersion(): Promise<boolean>;

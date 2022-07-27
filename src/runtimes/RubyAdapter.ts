@@ -4,7 +4,7 @@ import {RuntimeAdapter} from './Adapter';
 
 export class RubyRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdapter {
   // @public
-  readonly runtimeId: NSLayerConfig.RuntimeIds = 'ruby';
+  readonly runtimeId: Config.RuntimeIds = 'ruby';
 
   readonly defaultConfig = {
     packageManager:  'bundle',
@@ -28,7 +28,7 @@ export class RubyRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdapte
   }
 
   readonly commands = {
-    bundle: (x: NSLayerConfig.IRuby) => `bundle install --gemfile=${x.dependenciesPath} --path=./`,
+    bundle: (x: Config.IRuby) => `bundle install --gemfile=${x.dependenciesPath} --path=./`,
   }
 
   async hasDependenciesDiff(): Promise<boolean> {

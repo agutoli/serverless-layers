@@ -12,7 +12,7 @@ export class RuntimeResolver {
   private _adapter: IRuntimeAdapter | undefined;
 
   // stores registered adapters ids
-  private _registeredAdapters:  Array<NSLayerConfig.RuntimeIds> = [];
+  private _registeredAdapters:  Array<Config.RuntimeIds> = [];
 
   /**
    * Final class (not able to extends)
@@ -25,7 +25,7 @@ export class RuntimeResolver {
    * This method validates, and register
    * adapter that maches with current runtime.
    *
-   * @param {IRuntimeAdapter} adapter - Runtime adapter instance.
+   * @param adapter - Runtime adapter instance.
    */
   registerAdapter(adapter: IRuntimeAdapter): void | Error {
     const runtimeOption = this._facade.getRuntime();
@@ -71,7 +71,7 @@ export class RuntimeResolver {
     return this._adapter;
   }
 
-  parseLayersConfig(adapter: IRuntimeAdapter): Array<{[key: string]: any}> {
+  parseLayersConfig(adapter: IRuntimeAdapter): LayerConfig[] {
     // retrieves yaml custom configs
     const customConfigs = this._facade.getCustomConfigs();
 
@@ -84,15 +84,37 @@ export class RuntimeResolver {
       ...adapter?.defaultConfig
     };
 
-    let newConfigs: Array<any> = Array.isArray(customConfigs)
-      ? customConfigs : [{'default': customConfigs}];
+    const createLayerConfigInstances = (
+      previous: LayerConfig[],
+      current: KeyValue<Config.CustomConfigs>
+    ): LayerConfig[] => {
+      /**
+       * @example
+       * ```
+       * [
+       *   'myGivenLayerName',
+       *   {
+       *      ...
+       *      packageManager: 'npm',
+       *      arn: '...'
+       *      ...
+       *   }
+       * ]
+       * ```
+       */
+      const customConfigEntries = Object.entries<Config.CustomConfigs>(current);
 
-    return newConfigs.reduce((s, c): any => {
-      for (let [key, value] of Object.entries<any>(c)) {
-        // merges runtime vs custom configs
-        s.push(new LayerConfig(key, {...runtimeConfigs, ...value}));
+      for (const [layerName, customConfig] of customConfigEntries) {
+        // merges default runtime configs with custom configs entries
+        const v = new LayerConfig(layerName, {
+          ...runtimeConfigs,
+          ...customConfig
+        });
+        previous.push(v);
       }
-      return s;
-    }, [])
+
+      return previous;
+    }
+    return customConfigs.reduce<LayerConfig[]>(createLayerConfigInstances, []);
   }
 }

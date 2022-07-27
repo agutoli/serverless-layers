@@ -1,7 +1,5 @@
 import Err from './errors';
-
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
 import archiver from 'archiver';
 import fastFolderSizeSync from 'fast-folder-size/sync';
@@ -10,11 +8,11 @@ import fastFolderSizeSync from 'fast-folder-size/sync';
 // @see https://en.wikipedia.org/wiki/Binary_prefix
 const MB = 1024 ** 2;
 
-/**
- * 50 MB (zipped, for direct upload)
- * @see https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html
- */
-const DEPLOYMENT_PACKAGE_KB_ZIPPED = 50 * MB;
+// /**
+//  * 50 MB (zipped, for direct upload)
+//  * @see https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html
+//  */
+// const DEPLOYMENT_PACKAGE_KB_ZIPPED = 50 * MB;
 
 /**
  * 250 MB (unzipped)
@@ -100,4 +98,4 @@ export class ZipLayer {
       });
     });
   }
-};
+}

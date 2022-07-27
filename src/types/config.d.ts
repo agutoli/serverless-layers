@@ -1,8 +1,4 @@
-interface KeyValue {
-  [key: string]: any;
-}
-
-namespace NSLayerConfig {
+declare namespace Config {
   /**
    * Supported Runtimes
    */
@@ -12,7 +8,7 @@ namespace NSLayerConfig {
    * The common configurations across
    * all supported languages.
    */
-  interface ICommon {
+  interface ICommon  extends object {
     arn?: string;
 
     compileDir: string;
@@ -74,4 +70,6 @@ namespace NSLayerConfig {
    * by using "custom" property.
    */
   type CustomConfigs = INodeJS | IRuby | IPython;
-};
+  type CustomConfigsKey = keyof CustomConfigs;
+  type CustomConfigsValue = ValueOf<CustomConfigs>;
+}

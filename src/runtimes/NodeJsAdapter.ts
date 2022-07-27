@@ -4,7 +4,7 @@ import {RuntimeAdapter} from './Adapter';
 
 export class NodeJsRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdapter {
   // @public
-  readonly runtimeId: NSLayerConfig.RuntimeIds = 'nodejs';
+  readonly runtimeId: Config.RuntimeIds = 'nodejs';
 
   readonly defaultConfig = {
     packageManager: 'npm',

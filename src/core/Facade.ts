@@ -23,7 +23,7 @@ export class ServerlessFacade implements IServerlessFacade {
     this._service = serverless.service;
   }
 
-  async awsRequest(serviceAction: string, params: KeyValue): Promise<KeyValue> {
+  async awsRequest(serviceAction: string, params: KeyValue<unknown>): Promise<KeyValue<unknown>> {
     const [service, action] = serviceAction.split(':');
     return this._provider.request(service, action, params);
   }
@@ -52,16 +52,18 @@ export class ServerlessFacade implements IServerlessFacade {
     }
   }
 
-  getCustomConfigs(): NSLayerConfig.CustomConfigs {
-    const custom = this._service.custom as KeyValue;
-    return custom && custom['serverless-layers'] || {};
+  getCustomConfigs(): KeyValue<Config.CustomConfigs>[] {
+    const custom = this._service.custom as KeyValue<unknown>;
+    const value = custom && custom['serverless-layers'] || [];
+    return Array.isArray(value)
+      ? value : [{'default': value}];
   }
 
   getServerlessVersion(): string {
     return this._serverless.getVersion();
   }
 
-  defineCustomProperties(properties: KeyValue): void {
+  defineCustomProperties(properties: KeyValue<unknown>): void {
     this._serverless.configSchemaHandler.defineCustomProperties({
       type: 'object',
       properties: {
@@ -76,11 +78,6 @@ export class ServerlessFacade implements IServerlessFacade {
    */
   getDeploymentBucketName(): string | undefined {
     const {deploymentBucket} = this._service.provider as AwsProvider.Provider;
-    const customConfigs = this.getCustomConfigs();
-
-    if (customConfigs.layersDeploymentBucket) {
-      return customConfigs.layersDeploymentBucket;
-    }
 
     if (typeof deploymentBucket === 'string') {
         return deploymentBucket;

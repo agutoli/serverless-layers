@@ -8,9 +8,6 @@ import {RuntimeResolver} from './core/Runtime';
 import {LayerConfig} from './core/LayerConfig';
 import {ServerlessFacade} from './core/Facade';
 
-// runtime adapters
-import {RuntimeAdapter} from './runtimes/Adapter';
-
 import {RubyRuntimeAdapter} from './runtimes/RubyAdapter';
 import {NodeJsRuntimeAdapter} from './runtimes/NodeJsAdapter';
 import {PythonRuntimeAdapter} from './runtimes/PythonAdapter';
@@ -28,8 +25,8 @@ export class ServerlessLayers implements Plugin {
   runtime: IRuntimeAdapter;
 
   /**
-   * @param {Serverless} serverless - The first input number
-   * @param {Serverless.Options} options - The second input number
+   * @param serverless - The Serverless initial object
+   * @param options - The cli options
    */
   constructor(serverless: Serverless, options: Serverless.Options) {
     // This class is responsible to handle access to
@@ -90,7 +87,9 @@ export class ServerlessLayers implements Plugin {
   }
 
   /**
-   * @Event
+   * This hook is triggered when packing or
+   * deploying serverless.
+   * @eventProperty
    */
   async packageHook(layerConfig: LayerConfig): Promise<void> {
     const state = new State(this.facade, layerConfig);
