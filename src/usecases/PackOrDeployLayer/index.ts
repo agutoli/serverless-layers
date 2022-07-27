@@ -22,4 +22,6 @@ export async function UseCase ({
     await AddLayerToServerless.UseCase(arn, { facade });
     return ;
   }
+
+  console.log({ runtime, state });
 }
