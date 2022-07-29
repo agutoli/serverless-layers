@@ -10,11 +10,14 @@ import * as AddLayerToServerless from '../src/usecases/PackOrDeployLayer/AddLaye
 import * as PackOrDeployLayer from '../src/usecases/PackOrDeployLayer';
 
 const createInstance = (opts = {}) => {
-  let facade = mocksInit.serverlessFacade({
-    runtime: "nodejs14.x"
-  });
+  const runtimeId = 'nodejs14.x';
+  const logging = mocksInit.createLoggingMock();
+  const facade = mocksInit.serverlessFacade({runtime: runtimeId});
 
-  let layerConfig = new LayerConfig('myLayerName', {
+  const layerConfig = new LayerConfig('myLayerName', {
+    path: '.',
+    runtimeDir: '.',
+    runtime: runtimeId,
     compileDir: '.',
     libraryFolder: '',
     dependenciesPath: '',
@@ -23,12 +26,13 @@ const createInstance = (opts = {}) => {
     compatibleArchitectures: [],
     ...opts
   });
-  let state = new State(facade, layerConfig);
-  let resolver = new RuntimeResolver(facade);
+  const state = new State(facade, layerConfig);
+  const resolver = new RuntimeResolver(facade);
   resolver.registerAdapter(new NodeJsRuntimeAdapter);
-  let runtime = resolver.resolve();
+  const runtime = resolver.resolve();
 
   return {
+    logging,
     facade,
     layerConfig,
     state,
@@ -38,14 +42,15 @@ const createInstance = (opts = {}) => {
 }
 
 describe('PackOrDeployLayer', () => {
-  it('Returns static layer arn straightway when set "arn" option', async () => {
-    let arn = 'arn:aws:lambda:us-east-1:<your_account>:layer:node-v13-11-0:5';
-    let v = createInstance({arn});
+  it('Calls AddLayerToServerless when set "arn" option with static layer arn', async () => {
+    const arn = 'arn:aws:lambda:us-east-1:<your_account>:layer:node-v13-11-0:5';
+    const v = createInstance({arn});
 
     await PackOrDeployLayer.UseCase({
       state: v.state,
       facade: v.facade,
       runtime: v.runtime,
+      logging: v.logging,
       layerConfig: v.layerConfig
     });
 

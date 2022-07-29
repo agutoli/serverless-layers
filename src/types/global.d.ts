@@ -10,10 +10,13 @@ type Entries<T> = {
 
 type Test = Entries<Obj>;
 
+type CallableHook = (n: LayerConfig) => Promise<void>;
+
 interface IServerlessFacade {
   getRuntime(): string | undefined;
   getFunctions():  AwsProvider.Functions;
-  awsRequest(serviceAction: string, params: unknown, opts: unknown): Promise<unknown>;
+  getOptions(): Serverless.Options;
+  awsRequest(serviceAction: string, params: unknown): Promise<unknown>;
   attachLayerByArn(arn: string): void;
   getServerlessVersion(): string;
   getCustomConfigs(): KeyValue<Config.CustomConfigs>[];

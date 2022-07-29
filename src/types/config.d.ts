@@ -10,9 +10,10 @@ declare namespace Config {
    */
   interface ICommon  extends object {
     arn?: string;
-
+    path: string;
+    runtime: string;
+    runtimeDir: string;
     compileDir: string;
-
     layersDeploymentBucket?: string | undefined,
 
     /**

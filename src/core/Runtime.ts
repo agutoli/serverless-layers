@@ -80,7 +80,7 @@ export class RuntimeResolver {
       runtime: this._facade.getRuntime(),
       runtimeDir: adapter?.runtimeId,
       deploymentBucket: this._facade.getDeploymentBucketName(),
-      compatibleRuntimes: [adapter?.runtimeId],
+      compatibleRuntimes: [this._facade.getRuntime()],
       ...adapter?.defaultConfig
     };
 

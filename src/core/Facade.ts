@@ -23,9 +23,15 @@ export class ServerlessFacade implements IServerlessFacade {
     this._service = serverless.service;
   }
 
-  async awsRequest(serviceAction: string, params: KeyValue<unknown>): Promise<KeyValue<unknown>> {
+  async awsRequest(
+    serviceAction: string, params: KeyValue<unknown>
+  ): Promise<KeyValue<unknown>> {
     const [service, action] = serviceAction.split(':');
     return this._provider.request(service, action, params);
+  }
+
+  getOptions(): Serverless.Options {
+    return this._options;
   }
 
   /***

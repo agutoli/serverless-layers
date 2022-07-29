@@ -8,6 +8,7 @@ export class LayerConfig {
   constructor(configHey: string, _config: Config.CustomConfigs) {
     this._config = Object.assign({
       path: process.cwd(),
+      runtime: null,
       functions: null,
       configHey: configHey,
       forceInstall: false,
@@ -21,7 +22,7 @@ export class LayerConfig {
     Object.assign(this, this._config);
   }
 
-  get<T>(key: string): T {
+  get<T>(key: Config.CustomConfigsKey): T {
     return (this._config[key as Config.CustomConfigsKey] as unknown) as T;
   }
 

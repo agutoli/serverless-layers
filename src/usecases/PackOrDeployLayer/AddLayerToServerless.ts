@@ -4,6 +4,9 @@ type Injection = {
 
 export async function UseCase(arn: string, { facade }: Injection): Promise<void> {
   const functions = facade.getFunctions();
+
+  console.log({ functions });
+
   for (const funcName in functions) {
     if (functions[funcName].layers) {
       const arns = new Set(functions[funcName].layers)

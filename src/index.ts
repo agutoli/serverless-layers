@@ -12,15 +12,19 @@ import {RubyRuntimeAdapter} from './runtimes/RubyAdapter';
 import {NodeJsRuntimeAdapter} from './runtimes/NodeJsAdapter';
 import {PythonRuntimeAdapter} from './runtimes/PythonAdapter';
 
+
+// custom commands
+import * as LayersListCommand from './usecases/LayersCommands/LayersList';
+
 // UseCases
 import * as PackOrDeployLayer from './usecases/PackOrDeployLayer';
-
-type CallableHook = (n: LayerConfig) => Promise<void>;
 
 export class ServerlessLayers implements Plugin {
   customProp = {};
 
+  commands: Plugin.Commands;
   hooks: Plugin.Hooks;
+  logging: Plugin.Logging;
   facade: IServerlessFacade;
   runtime: IRuntimeAdapter;
 
@@ -28,7 +32,15 @@ export class ServerlessLayers implements Plugin {
    * @param serverless - The Serverless initial object
    * @param options - The cli options
    */
-  constructor(serverless: Serverless, options: Serverless.Options) {
+  constructor(
+    serverless: Serverless,
+    options: Serverless.Options,
+    logging: Plugin.Logging
+  ) {
+    // CLI output in plugins
+    // @see https://www.serverless.com/framework/docs/guides/plugins/cli-output
+    this.logging = logging;
+
     // This class is responsible to handle access to
     // serverless framework methods, objects, etc.
     this.facade = new ServerlessFacade(serverless, options);
@@ -46,7 +58,26 @@ export class ServerlessLayers implements Plugin {
     // is compatible with current runtime.
     this.runtime = resolver.resolve();
 
+    this.commands = {
+      'layers:list': {
+        usage: 'List all layers related with this stack.',
+        lifecycleEvents: ['list'],
+        options: {
+          'max-items': {
+            usage: 'The maximum number of layers to return.'
+          },
+          'compatible-runtime': {
+            usage: 'A runtime identifier. For example, "nodejs", "nodejs16.x" or "all"'
+          },
+          'compatible-architecture': {
+            usage: 'The compatible instruction set architecture. Possible values include: x86_64 or arm64'
+          },
+        }
+      },
+    };
+
     this.hooks = {
+
       // 'package:compileFunctions': async () => {
       //   console.log('package:compileFunctions');
       // },
@@ -56,6 +87,8 @@ export class ServerlessLayers implements Plugin {
       // 'aws:common:cleanupTempDir:cleanup': async () => {
       //   console.log('aws:common:cleanupTempDir:cleanup');
       // },
+      'layers:list:list': this.binder(this.layerListCommandHook),
+      'package:compileLayers': this.binder(this.compileLayersHook),
       'before:package:initialize': this.binder(this.packageHook),
       'before:package:function:package': this.binder(this.packageHook),
       'aws:info:displayLayers': this.binder(this.finalizeHook),
@@ -86,6 +119,23 @@ export class ServerlessLayers implements Plugin {
     }
   }
 
+  async compileLayersHook(layerConfig: LayerConfig): Promise<void> {
+    // console.log('compileLayersHook:', { layerConfig });
+  }
+
+  /**
+   * This hook is triggered when packing or
+   * deploying serverless.
+   * @eventProperty
+   */
+   async layerListCommandHook(layerConfig: LayerConfig): Promise<void> {
+    await LayersListCommand.UseCase({
+      layerConfig,
+      facade: this.facade,
+      logging: this.logging
+    });
+   }
+
   /**
    * This hook is triggered when packing or
    * deploying serverless.
@@ -98,7 +148,8 @@ export class ServerlessLayers implements Plugin {
       state,
       layerConfig,
       facade: this.facade,
-      runtime: this.runtime
+      runtime: this.runtime,
+      logging: this.logging
     });
   }
 

@@ -84,7 +84,7 @@ describe('LayerConfig', () => {
         packageManagerExtraArgs: '',
         libraryFolder: 'node_modules',
         customInstallationCommand: null,
-        compatibleRuntimes: ['nodejs'],
+        compatibleRuntimes: ['nodejs14.x'],
         compatibleArchitectures: ['x86_64', 'arm64'],
         copyBeforeInstall: [
           '.npmrc',
@@ -133,7 +133,7 @@ describe('LayerConfig', () => {
         libraryFolder: 'gems',
         deploymentBucket: 'my-test-bucket',
         customInstallationCommand: null,
-        compatibleRuntimes: ['ruby'],
+        compatibleRuntimes: ['ruby2.7'],
         compatibleArchitectures: ['x86_64', 'arm64'],
         copyAfterInstall: [
           { from: 'ruby', to: 'gems' }

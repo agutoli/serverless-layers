@@ -10,7 +10,7 @@ export class State {
   }
 
   async getSettings(): Promise<void> {
-    console.log(this._layerConfig);
+    // console.log(this._layerConfig);
 
     // return this._facade.awsRequest('S3:getObject', {
     //   Bucket: '',
