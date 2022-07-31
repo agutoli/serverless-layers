@@ -15,6 +15,7 @@ import {PythonRuntimeAdapter} from './runtimes/PythonAdapter';
 
 // custom commands
 import * as LayersListCommand from './usecases/LayersCommands/LayersList';
+import * as LayersPackageCommand from './usecases/LayersCommands/LayersPackage';
 
 // UseCases
 import * as PackOrDeployLayer from './usecases/PackOrDeployLayer';
@@ -60,7 +61,7 @@ export class ServerlessLayers implements Plugin {
 
     this.commands = {
       'layers:list': {
-        usage: 'List all layers related with this stack.',
+        usage: 'List all layers related with this stack. E.g. sls layers:list',
         lifecycleEvents: ['list'],
         options: {
           'max-items': {
@@ -74,6 +75,16 @@ export class ServerlessLayers implements Plugin {
           },
         }
       },
+      'layers:package': {
+        usage: 'Package layers given a name. E.g. "sls layers:package --layer-name myLayerKey"',
+        lifecycleEvents: ['package'],
+        options: {
+          'layer-name': {
+            required: true,
+            usage: 'The layer name specified on "custom.serverless-layers.<layer-name>" in serverless.yaml.'
+          },
+        }
+      }
     };
 
     this.hooks = {
@@ -88,6 +99,7 @@ export class ServerlessLayers implements Plugin {
       //   console.log('aws:common:cleanupTempDir:cleanup');
       // },
       'layers:list:list': this.binder(this.layerListCommandHook),
+      'layers:package:package': this.binder(this.layerPackageCommandHook),
       'package:compileLayers': this.binder(this.compileLayersHook),
       'before:package:initialize': this.binder(this.packageHook),
       'before:package:function:package': this.binder(this.packageHook),
@@ -120,18 +132,33 @@ export class ServerlessLayers implements Plugin {
   }
 
   async compileLayersHook(layerConfig: LayerConfig): Promise<void> {
-    // console.log('compileLayersHook:', { layerConfig });
+    console.log('compileLayersHook:', { layerConfig });
   }
 
   /**
-   * This hook is triggered when packing or
-   * deploying serverless.
+   * This hooks is triggered when using command
+   * "sls layers:list"
    * @eventProperty
    */
    async layerListCommandHook(layerConfig: LayerConfig): Promise<void> {
     await LayersListCommand.UseCase({
       layerConfig,
+      runtime: this.runtime,
       facade: this.facade,
+      logging: this.logging
+    });
+   }
+
+  /**
+   * This hooks is triggered when using command
+   * "sls layers:package"
+   * @eventProperty
+   */
+   async layerPackageCommandHook(layerConfig: LayerConfig): Promise<void> {
+    await LayersPackageCommand.UseCase({
+      layerConfig,
+      facade: this.facade,
+      runtime: this.runtime,
       logging: this.logging
     });
    }

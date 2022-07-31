@@ -14,6 +14,10 @@
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
     "outDir": "dist",
+    "lib": [
+      "es5",
+      "es2015.promise"
+    ],
     "sourceMap": true,
     "typeRoots": [
       "./node_modules/@types",

@@ -15,20 +15,14 @@ package:
 
 custom:
   serverless-layers:
-    - staticArn:
+    - core:
         functions:
           - hello
-        compatibleRuntimes: ["python2.6", "python3.8"]
-        arn: arn:aws:lambda:us-east-1:<your_account>:layer:node-v13-11-0:5
 
-# layers:
-#   layerOne:
-#     package:
-#       artifact: artifact-demo.zip
 
-# functions:
-#   hello:
-#     handler: handler.hello
+functions:
+  hello:
+    handler: handler.hello
 
 plugins:
   - ../index.js

@@ -16,7 +16,7 @@ interface IServerlessFacade {
   getRuntime(): string | undefined;
   getFunctions():  AwsProvider.Functions;
   getOptions(): Serverless.Options;
-  awsRequest(serviceAction: string, params: unknown): Promise<unknown>;
+  awsRequest<T>(serviceAction: string, params: unknown): Promise<T>;
   attachLayerByArn(arn: string): void;
   getServerlessVersion(): string;
   getCustomConfigs(): KeyValue<Config.CustomConfigs>[];
@@ -25,6 +25,7 @@ interface IServerlessFacade {
 }
 
 interface IRuntimeAdapter {
+  readonly commands: KeyValue;
   readonly runtimeId: Config.RuntimeIds;
   readonly defaultConfig: {[key: string]: unknown};
   loadLayersConfig(config: LayerConfig): void;

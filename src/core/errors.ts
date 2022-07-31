@@ -18,6 +18,12 @@ export = {
   ),
   InvalidLayerPackage: CustomError(
     "InvalidLayerPackage"
+  ),
+  CommandError: CustomError(
+    "CommandError"
+  ),
+  NotSupported: CustomError(
+    "NotSupported"
   )
 }
 

@@ -5,12 +5,12 @@ export class LayerConfig {
 
   _config: Config.CustomConfigs;
 
-  constructor(configHey: string, _config: Config.CustomConfigs) {
+  constructor(layerConfigKey: string, _config: Config.CustomConfigs) {
     this._config = Object.assign({
+      layerConfigKey,
       path: process.cwd(),
       runtime: null,
       functions: null,
-      configHey: configHey,
       forceInstall: false,
       dependencyInstall: true,
       compileDir: ".serverless",
@@ -24,6 +24,13 @@ export class LayerConfig {
 
   get<T>(key: Config.CustomConfigsKey): T {
     return (this._config[key as Config.CustomConfigsKey] as unknown) as T;
+  }
+
+  compileDirAbsPath(): string {
+    return path.join(
+      this.get<string>('path'),
+      this.get<string>('compileDir')
+    );
   }
 
   layerPackagePath(): string {

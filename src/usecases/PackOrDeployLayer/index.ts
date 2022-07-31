@@ -15,9 +15,9 @@ type Injection = {
 };
 
 export async function UseCase ({
-  state,
+  // state,
   facade,
-  runtime,
+  // runtime,
   logging,
   layerConfig
 } : Injection): Promise<void> {

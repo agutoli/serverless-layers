@@ -73,12 +73,12 @@ describe('LayerConfig', () => {
         path: '/app',
         compileDir: '.serverless',
         functions: null,
-        configHey: "default",
         forceInstall: false,
         runtimeDir: 'nodejs',
         runtime: 'nodejs14.x',
         packageManager: 'npm',
         dependencyInstall: true,
+        layerConfigKey: "default",
         deploymentBucket: 'my-test-bucket',
         dependenciesPath: 'package.json',
         packageManagerExtraArgs: '',
@@ -120,7 +120,7 @@ describe('LayerConfig', () => {
     it('defaults configurations', () => {
       expect(layersConfig[0].toJSON()).toEqual({
         path: '/app',
-        configHey: "default",
+        layerConfigKey: "default",
         compileDir: '.serverless',
         functions: null,
         forceInstall: false,

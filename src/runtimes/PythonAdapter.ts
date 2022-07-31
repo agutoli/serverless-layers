@@ -1,6 +1,7 @@
 import Err from '../core/errors';
 
 import {RuntimeAdapter} from './Adapter';
+import {LayerConfig} from '../core/LayerConfig';
 
 export class PythonRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdapter {
   // @public
@@ -22,7 +23,7 @@ export class PythonRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdap
   }
 
   readonly commands = {
-    pip: (x:  Config.IPython) => `pip install -r ${x.dependenciesPath} -t .`
+    pip: (x: LayerConfig) => `pip install -r ${x.get<string>('dependenciesPath')} -t .`
   }
 
   async hasDependenciesDiff(): Promise<boolean> {
