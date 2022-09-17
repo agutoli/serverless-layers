@@ -1,0 +1,24 @@
+service: demo-simple
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: python3.8
+  deploymentBucket:
+    name: agutoli-my-test-bucket
+
+package:
+  individually: true
+  excludeDevDependencies: false
+
+custom:
+  serverless-layers:
+    functions:
+      - hello
+
+functions:
+  hello:
+    handler: handler.hello
+
+plugins:
+  - ../index.js

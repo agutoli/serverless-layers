@@ -14,8 +14,9 @@ import {PythonRuntimeAdapter} from './runtimes/PythonAdapter';
 
 
 // custom commands
-import * as LayersListCommand from './usecases/LayersCommands/LayersList';
-import * as LayersPackageCommand from './usecases/LayersCommands/LayersPackage';
+import * as LayersListCommand from './commands/LayersList';
+import * as LayersRemoveCommand from './commands/LayersRemove';
+import * as LayersPackageCommand from './commands/LayersPackage';
 
 // UseCases
 import * as PackOrDeployLayer from './usecases/PackOrDeployLayer';
@@ -46,7 +47,7 @@ export class ServerlessLayers implements Plugin {
     // serverless framework methods, objects, etc.
     this.facade = new ServerlessFacade(serverless, options);
 
-    // this classes is responsible to detect what
+    // This class is responsible to detect what
     // runtime adapter should be loaded.
     const resolver = new RuntimeResolver(this.facade);
 
@@ -84,7 +85,14 @@ export class ServerlessLayers implements Plugin {
             usage: 'The layer name specified on "custom.serverless-layers.<layer-name>" in serverless.yaml.'
           },
         }
-      }
+      },
+      'layers:remove': {
+        usage: 'Remove layer given an arn.',
+        lifecycleEvents: ['remove'],
+        options: {
+
+        }
+      },
     };
 
     this.hooks = {
@@ -98,13 +106,14 @@ export class ServerlessLayers implements Plugin {
       // 'aws:common:cleanupTempDir:cleanup': async () => {
       //   console.log('aws:common:cleanupTempDir:cleanup');
       // },
-      'layers:list:list': this.binder(this.layerListCommandHook),
-      'layers:package:package': this.binder(this.layerPackageCommandHook),
-      'package:compileLayers': this.binder(this.compileLayersHook),
-      'before:package:initialize': this.binder(this.packageHook),
-      'before:package:function:package': this.binder(this.packageHook),
-      'aws:info:displayLayers': this.binder(this.finalizeHook),
-      'after:deploy:function:deploy': this.binder(this.finalizeHook),
+      'layers:list:list': this.on(this.layerListCommandHook),
+      'layers:remove:remove': this.on(this.layerRemoveCommandHook),
+      'layers:package:package': this.on(this.layerPackageCommandHook),
+      'package:compileLayers': this.on(this.compileLayersHook),
+      'before:package:initialize': this.on(this.packageHook),
+      'before:package:function:package': this.on(this.packageHook),
+      'aws:info:displayLayers': this.on(this.finalizeHook),
+      'after:deploy:function:deploy': this.on(this.finalizeHook),
       // 'before:package:function:package': async () => {
       //   console.log('before:package:function:package');
       //   await this.package();
@@ -122,8 +131,10 @@ export class ServerlessLayers implements Plugin {
     };
   }
 
-  binder(callback: CallableHook) {
+  on(callback: CallableHook) {
     const layersConfig = this.runtime.getLayersConfig();
+    // console.log(layersConfig);
+
     return async () => {
       for (const layerConfig in layersConfig) {
         await callback.apply(this, [layersConfig[layerConfig]]);
@@ -148,6 +159,19 @@ export class ServerlessLayers implements Plugin {
       logging: this.logging
     });
    }
+
+  /**
+   * This hooks is triggered when using command
+   * "sls layers:list"
+   * @eventProperty
+   */
+  async layerRemoveCommandHook(layerConfig: LayerConfig): Promise<void> {
+    await LayersRemoveCommand.UseCase({
+      layerConfig,
+      facade: this.facade,
+      logging: this.logging
+    });
+  }
 
   /**
    * This hooks is triggered when using command

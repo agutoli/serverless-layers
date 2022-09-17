@@ -16,6 +16,7 @@ declare namespace Config {
     compileDir: string;
     layerConfigKey: string;
     copyBeforeInstall: Array<string>;
+    copyAfterInstall: Array<string>;
     layersDeploymentBucket?: string | undefined,
 
     /**

@@ -4,9 +4,9 @@ import {NodeJsRuntimeAdapter} from '../src/runtimes/NodeJsAdapter';
 import {LayerConfig} from '../src/core/LayerConfig';
 import {State} from '../src/core/State';
 
-jest.mock('../src/usecases/PackOrDeployLayer/AddLayerToServerless');
+jest.mock('../src/usecases/PackOrDeployLayer/ScenarioStaticLayerArnOption');
 
-import * as AddLayerToServerless from '../src/usecases/PackOrDeployLayer/AddLayerToServerless';
+import * as ScenarioStaticLayerArnOption from '../src/usecases/PackOrDeployLayer/ScenarioStaticLayerArnOption';
 import * as PackOrDeployLayer from '../src/usecases/PackOrDeployLayer';
 
 const createInstance = (opts = {}) => {
@@ -19,10 +19,13 @@ const createInstance = (opts = {}) => {
     runtimeDir: '.',
     runtime: runtimeId,
     compileDir: '.',
+    layerConfigKey: 'myLayerName',
     libraryFolder: '',
     dependenciesPath: '',
     packageManager: 'npm',
     compatibleRuntimes: [],
+    copyAfterInstall: [],
+    copyBeforeInstall: [],
     compatibleArchitectures: [],
     ...opts
   });
@@ -42,7 +45,7 @@ const createInstance = (opts = {}) => {
 }
 
 describe('PackOrDeployLayer', () => {
-  it('Calls AddLayerToServerless when set "arn" option with static layer arn', async () => {
+  it('Calls ScenarioStaticLayerArnOption when set "arn" option with static layer arn', async () => {
     const arn = 'arn:aws:lambda:us-east-1:<your_account>:layer:node-v13-11-0:5';
     const v = createInstance({arn});
 
@@ -54,6 +57,8 @@ describe('PackOrDeployLayer', () => {
       layerConfig: v.layerConfig
     });
 
-    expect(AddLayerToServerless.UseCase).toHaveBeenCalledWith(arn, {facade: v.facade});
+    expect(
+      ScenarioStaticLayerArnOption.UseCase
+    ).toHaveBeenCalledWith(arn, {facade: v.facade});
   });
 });

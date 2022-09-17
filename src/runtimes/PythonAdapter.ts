@@ -19,7 +19,12 @@ export class PythonRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdap
       'package.json',
       'package-lock.json',
       'node_modules/**'
-    ]
+    ],
+    serverless: {
+      package: {
+        individually: true
+      }
+    }
   }
 
   readonly commands = {

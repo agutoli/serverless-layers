@@ -21,23 +21,6 @@ export async function UseCase ({
   logging,
   layerConfig
 } : Injection): Promise<void> {
-  logging.log.error("error: logs");
-  logging.log.warning("warning: logs");
-  logging.log.notice("notice: logs");
-  logging.log.info("info: logs");
-  logging.log.debug("debug: logs");
-  logging.log.verbose("verbose: logs");
-  logging.log.success("success: logs");
-  logging.writeText('writeText: logs');
-
-  const mainProgress = logging.progress.get('main');
-
-  let x = 0;
-  setInterval(function(){
-    mainProgress.notice(`update: ${x}`);
-    x++;
-  }, 100);
-
   /**
    * Scenario: Attaching existent layer ARN to functions
    * - The "arn" option should be a valid ARN string

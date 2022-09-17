@@ -1,8 +1,8 @@
-import Err from '../../core/errors';
+import Err from '../core/errors';
 import type Plugin from 'serverless/classes/Plugin';
-import {LayerConfig} from '../../core/LayerConfig';
+import {LayerConfig} from '../core/LayerConfig';
 
-import * as InstallDependencies from '../PackOrDeployLayer/InstallDependencies';
+import * as InstallAndPackDependencies from '../usecases/PackOrDeployLayer/InstallAndPackDependencies';
 
 type Injection = {
   facade: IServerlessFacade;
@@ -37,7 +37,7 @@ export async function UseCase ({
   }
 
   // install package manager dependencies
-  await InstallDependencies.UseCase({
+  await InstallAndPackDependencies.UseCase({
     runtime,
     logging,
     layerConfig

@@ -24,7 +24,12 @@ export class RubyRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdapte
       'node_modules/**',
       'vendor/**',
       '.bundle'
-    ]
+    ],
+    serverless: {
+      package: {
+        individually: true
+      }
+    }
   }
 
   readonly commands = {

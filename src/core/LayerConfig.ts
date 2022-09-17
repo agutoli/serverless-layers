@@ -42,6 +42,13 @@ export class LayerConfig {
     );
   }
 
+  layerArtifactPath(): string {
+    return path.join(
+      this.compileDirAbsPath(),
+      `${this.get<string>('layerConfigKey')}-artifact.zip`
+    );
+  }
+
   dependencyAbsPath(): string {
     return path.resolve(
       path.join(

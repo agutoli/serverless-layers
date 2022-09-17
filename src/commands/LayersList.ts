@@ -1,7 +1,7 @@
 import type Plugin from 'serverless/classes/Plugin';
 import type Lambda from 'aws-sdk/clients/lambda';
 
-import {LayerConfig} from '../../core/LayerConfig';
+import {LayerConfig} from '../core/LayerConfig';
 
 type Injection = {
   facade: IServerlessFacade;
