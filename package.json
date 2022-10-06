@@ -41,7 +41,7 @@
     "fs-copy-file": "^2.1.2",
     "fs-extra": "^8.1.0",
     "glob": "^7.1.6",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "^0.5.6",
     "semver": "^7.3.2",
     "slugify": "^1.4.0"
   },
