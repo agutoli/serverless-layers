@@ -73,8 +73,8 @@ class Runtimes {
     return this._runtime.hasDependenciesChanges();
   }
 
-  rebaseLocalDependencies() {
-    this._runtime.rebaseLocalDependencies();
+  rebaseLocalDependencies(originalProjectJsonPath, layersProjectJsonFolder) {
+    this._runtime.rebaseLocalDependencies(originalProjectJsonPath, layersProjectJsonFolder);
   }
 }
 

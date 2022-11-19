@@ -1,10 +1,12 @@
 const { expect } = require('chai');
+const fs = require('fs');
 const lodashSet = require('lodash.set')
 const sinon = require('sinon');
 const Runtime = require('runtimes');
 
 const nodejsConfig = require('./fixtures/nodejsConfig')
 const pythonConfig = require('./fixtures/pythonConfig')
+const packageJsonWithLocalDependency = require("./fixtures/package.with-local.json");
 
 describe('Runtime', () => {
   describe('-> NodeJs', () => {
@@ -28,6 +30,13 @@ describe('Runtime', () => {
       })).to.deep.equal(nodejsConfig);
     })
 
+    it('rebase local dependencies', () => {
+      const packageJsonWithLocalDependency = require('./fixtures/package.with-local.json');
+      fs.writeFileSync('./tests/fixtures/output/package.json', JSON.stringify(packageJsonWithLocalDependency));
+      runtimes.rebaseLocalDependencies('./tests/fixtures/package.with-local.json', './tests/fixtures/output/');
+      expect(require('./fixtures/output/package.json')).to.deep.equal(require('./fixtures/output/package.expected.json'));
+    })
+
     describe('-> hasDependenciesChanges', () => {
       beforeEach(() => {
         const remoteDeps = JSON.stringify({
@@ -47,7 +56,7 @@ describe('Runtime', () => {
       });
 
       it('checks if version is compatible', () => {
-        
+
         return runtimes._runtime.isCompatibleVersion('v12.16').then((res) => {
           expect(res.isCompatible).to.equal(true);
         })
@@ -57,6 +66,31 @@ describe('Runtime', () => {
       })
 
       it('compares two package json and returns if different', () => {
+        return runtimes._runtime.hasDependenciesChanges().then((hasChanged) => {
+          expect(hasChanged).to.equal(true);
+        });
+      })
+    });
+
+    describe('-> hasDependenciesChanges with local dependency', () => {
+      beforeEach(() => {
+        const remoteDeps = JSON.stringify({
+          dependencies: {
+            'local-depth': 'file:../../folder'
+          }
+        })
+
+        lodashSet(plugin, 'bucketService.downloadDependencesFile', () => Promise.resolve(remoteDeps));
+
+        plugin.settings = runtimes.getDefaultSettings({
+          packageManager: 'yarn',
+          dependenciesPath: './tests/fixtures/package.with-local.json'
+        })
+        runtimes.init()
+        runtimes._runtime.parent.run = () => 'v12.20.1';
+      });
+
+      it('package json with local dependency', () => {
         return runtimes._runtime.hasDependenciesChanges().then((hasChanged) => {
           expect(hasChanged).to.equal(true);
         });

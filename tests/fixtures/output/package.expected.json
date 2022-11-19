@@ -1,0 +1,6 @@
+{
+  "name": "test-fixture",
+  "dependencies": {
+    "local-depth": "file:../../../folder"
+  }
+}

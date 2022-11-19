@@ -98,14 +98,14 @@ class NodeJSRuntime {
     return isDifferent;
   }
 
-  rebaseLocalDependencies(originalProjectJsonFolder, layersProjectJsonFolder) {
+  rebaseLocalDependencies(originalProjectJsonPath, layersProjectJsonFolder) {
     const relativePathToOriginProjectJson = path.relative(
       layersProjectJsonFolder,
-      originalProjectJsonFolder,
+      path.dirname(originalProjectJsonPath),
     );
 
-    const layersProjectJsonPath = `${layersProjectJsonFolder}/package.json`;
-    const packageJson = require(layersProjectJsonPath);
+    const layersProjectJsonPath = path.join(layersProjectJsonFolder, 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(layersProjectJsonPath));
     const { dependencies } = packageJson;
 
     for (const moduleName of Object.keys(dependencies)) {
@@ -113,7 +113,7 @@ class NodeJSRuntime {
       if (this.isLocalDependency(moduleVersion)) {
         const filePath = _.replace(moduleVersion, /^file:/, '');
         const updatedModuleVersion = _.replace(
-          `${_.startsWith(moduleVersion, 'file:') ? 'file:' : ''}${relativePathToOriginProjectJson}/${filePath}`,
+          `${_.startsWith(moduleVersion, 'file:') ? 'file:' : ''}${path.join(relativePathToOriginProjectJson, filePath)}`,
           /\\/g,
           '/'
         );
