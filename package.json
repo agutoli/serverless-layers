@@ -41,6 +41,7 @@
     "fs-copy-file": "^2.1.2",
     "fs-extra": "^8.1.0",
     "glob": "^7.1.6",
+    "lodash": "^4.17.21",
     "mkdirp": "^0.5.1",
     "semver": "^7.3.2",
     "slugify": "^1.4.0"

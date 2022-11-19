@@ -72,6 +72,10 @@ class Runtimes {
   hasDependenciesChanges() {
     return this._runtime.hasDependenciesChanges();
   }
+
+  rebaseLocalDependencies() {
+    this._runtime.rebaseLocalDependencies();
+  }
 }
 
 module.exports = Runtimes;

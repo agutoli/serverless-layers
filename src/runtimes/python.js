@@ -72,6 +72,10 @@ class PythonRuntime {
 
     return isDifferent;
   }
+
+  rebaseLocalDependencies() {
+    // unimplemented
+  }
 }
 
 module.exports = PythonRuntime;

@@ -57,7 +57,7 @@ class Dependencies extends AbstractService {
     });
   }
 
-  async install() {
+  async install(runtime) {
     const { copyBeforeInstall, copyAfterInstall } = this.plugin.settings;
 
     this.init();
@@ -79,6 +79,8 @@ class Dependencies extends AbstractService {
       const filename = copyBeforeInstall[index];
       await this.copyProjectFile(filename);
     }
+
+    runtime.rebaseLocalDependencies(this.getDepsPath(), this.layersPackageDir);
 
     // custom commands
     if (this.plugin.settings.customInstallationCommand) {

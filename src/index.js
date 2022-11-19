@@ -264,7 +264,7 @@ class ServerlessLayers {
 
     // ENABLED by default
     if (dependencyInstall && !artifact) {
-      await this.dependencies.install();
+      await this.dependencies.install(this.runtimes);
     }
 
     if (localDir && !artifact) {

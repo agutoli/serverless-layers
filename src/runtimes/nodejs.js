@@ -1,3 +1,5 @@
+const fs = require('fs');
+const _ = require('lodash');
 const path = require('path');
 
 class NodeJSRuntime {
@@ -68,11 +70,15 @@ class NodeJSRuntime {
     if (!isSizeEqual) return true;
 
     let hasDifference = false;
-    Object.keys(depsA).forEach(dependence => {
-      if (depsA[dependence] !== depsB[dependence]) {
-        hasDifference = true;
+    for (const dependence of Object.keys(depsA)) {
+      const isLocalDependency = this.isLocalDependency(depsA[dependence]);
+      const isVersionDiffer = depsA[dependence] !== depsB[dependence];
+      hasDifference = isLocalDependency || isVersionDiffer;
+
+      if (hasDifference) {
+        break;
       }
-    });
+    }
 
     return hasDifference;
   }
@@ -90,6 +96,38 @@ class NodeJSRuntime {
     }
 
     return isDifferent;
+  }
+
+  rebaseLocalDependencies(originalProjectJsonFolder, layersProjectJsonFolder) {
+    const relativePathToOriginProjectJson = path.relative(
+      layersProjectJsonFolder,
+      originalProjectJsonFolder,
+    );
+
+    const layersProjectJsonPath = `${layersProjectJsonFolder}/package.json`;
+    const packageJson = require(layersProjectJsonPath);
+    const { dependencies } = packageJson;
+
+    for (const moduleName of Object.keys(dependencies)) {
+      const moduleVersion = dependencies[moduleName];
+      if (this.isLocalDependency(moduleVersion)) {
+        const filePath = _.replace(moduleVersion, /^file:/, '');
+        const updatedModuleVersion = _.replace(
+          `${_.startsWith(moduleVersion, 'file:') ? 'file:' : ''}${relativePathToOriginProjectJson}/${filePath}`,
+          /\\/g,
+          '/'
+        );
+
+        dependencies[moduleName] = updatedModuleVersion;
+      }
+    }
+
+    const updatedProjectJsonStr = JSON.stringify(packageJson, null, 2);
+    fs.writeFileSync(layersProjectJsonPath, updatedProjectJsonStr);
+  }
+
+  isLocalDependency(moduleVersion) {
+    return /^(?:file:[^/]{2}|\.\/|\.\.\/)/.test(moduleVersion);
   }
 }
 

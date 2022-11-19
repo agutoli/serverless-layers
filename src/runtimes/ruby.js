@@ -80,6 +80,10 @@ class RubyRuntime {
 
     return isDifferent;
   }
+
+  rebaseLocalDependencies() {
+    // unimplemented
+  }
 }
 
 module.exports = RubyRuntime;
