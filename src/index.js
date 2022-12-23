@@ -93,7 +93,7 @@ class ServerlessLayers {
       await this.main();
     }
 
-    console.log('\n');
+    this.breakLine();
   }
 
   async cleanUpAllLayers() {
@@ -412,45 +412,45 @@ class ServerlessLayers {
     const funcs = this.settings.functions;
     const cliOpts = this.provider.options;
 
-    if (!funcs || !functions || funcs.length === functions.length) {
-      // if we are not specifying functions
-      // or if the service has no functions
-      // or we are specifying all functions of the service
-      // then add the layer to providers
-      if (this.service.provider.layers) {
-        this.service.provider.layers.push(layerArn);
-      } else {
-        this.service.provider.layers = [layerArn];
+    // Attaches to provider level when
+    // no functions available. It happens when
+    // someone want to use serverless to create all layers
+    // or resources but not the functions.
+    if (!functions || Object.keys(functions).length === 0) {
+      // Simple validations when layers attribute is null.
+      if (!this.service.provider.layers) {
+        this.service.provider.layers = []
       }
+
+      this.service.provider.layers.push(layerArn);
+
       this.log(
         `${chalk.magenta.bold('provider')} - ${this.logArn(layerArn)}`,
         ' ✓'
       );
+    } else {
+      Object.keys(functions).forEach(funcName => {
+        if (cliOpts.function && cliOpts.function !== funcName) {
+          return;
+        }
+
+        let isEnabled = !funcs;
+
+        if (Array.isArray(funcs) && funcs.indexOf(funcName) !== -1) {
+          isEnabled = true;
+        }
+
+        if (isEnabled) {
+          // if this function has other layers add ours too so it applies
+          functions[funcName].layers = functions[funcName].layers || [];
+          functions[funcName].layers.push(layerArn);
+          functions[funcName].layers = Array.from(new Set(functions[funcName].layers));
+          this.log(`function.${chalk.magenta.bold(funcName)} - ${this.logArn(layerArn)}`, ' ✓');
+        } else {
+          this.warn(`(Skipped) function.${chalk.magenta.bold(funcName)}`, ` x`);
+        }
+      });
     }
-
-    Object.keys(functions).forEach(funcName => {
-      if (cliOpts.function && cliOpts.function !== funcName) {
-        return;
-      }
-
-      let isEnabled = !funcs;
-
-      if (Array.isArray(funcs) && funcs.indexOf(funcName) !== -1) {
-        isEnabled = true;
-      }
-
-      if (isEnabled && functions[funcName].layers) {
-        // if this function has other layers add ours too so it applies
-        functions[funcName].layers = functions[funcName].layers || [];
-        functions[funcName].layers.push(layerArn);
-        functions[funcName].layers = Array.from(new Set(functions[funcName].layers));
-        this.log(`function.${chalk.magenta.bold(funcName)} - ${this.logArn(layerArn)}`, ' ✓');
-      } else {
-        // otherwise please skip this function so the provider.layers can take care of it
-        const noLayersMessage = functions[funcName].layers ? '' : ' - because it has no other layers'
-        this.warn(`(Skipped) function.${chalk.magenta.bold(funcName)}${noLayersMessage}`, ` x`);
-      }
-    });
 
     this.service.resources = this.service.resources || {};
     this.service.resources.Outputs = this.service.resources.Outputs || {};
@@ -493,7 +493,7 @@ class ServerlessLayers {
         this.log(`function.${chalk.magenta.bold(funcName)} = layers.${this.logArn(currentLayerARN)}`);
       });
     });
-    console.log('\n');
+    this.breakLine();
   }
 
   log(msg, signal=' ○') {
@@ -501,7 +501,7 @@ class ServerlessLayers {
   }
 
   logGroup(msg) {
-    console.log('\n');
+    this.breakLine();
     this.serverless.cli.log(`[ LayersPlugin ]: ${chalk.magenta.bold('=>')} ${chalk.greenBright.bold(msg)}`);
   }
 
@@ -515,6 +515,10 @@ class ServerlessLayers {
 
   cleanUpLayers() {
     return this.layersService.cleanUpLayers();
+  }
+
+  breakLine() {
+    console.log('\n');
   }
 
   logArn(arn) {
