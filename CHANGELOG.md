@@ -1,3 +1,8 @@
+# 2.6.1 (2022-12-23)
+- [dependabot mocha](https://github.com/agutoli/serverless-layers/commit/4aca58091e6bf0472e12814513fd800590ae5705)
+- [Bugfix: Unable to attach layers to the existing lambda](https://github.com/agutoli/serverless-layers/issues/97)
+- [Feature: Bucket ServerSideEncryption](https://github.com/agutoli/serverless-layers/commit/f4770bfb68bc12047e42e545bc1061cdb10accbe)
+
 # 2.3.3 (2020-12-02)
 - [Improvement: Layers output beautified](https://github.com/agutoli/serverless-layers/issues/48)
 
