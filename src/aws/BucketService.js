@@ -19,6 +19,7 @@ class UploadService extends AbstractService {
     const params = {
       Bucket: this.bucketName,
       Key: this.zipFileKeyName,
+      ServerSideEncryption: this.plugin.getBucketEncryptiom(),
       Body: fs.createReadStream(this.plugin.getPathZipFileName())
     };
 
@@ -42,7 +43,8 @@ class UploadService extends AbstractService {
     const params = {
       Body,
       Bucket: this.bucketName,
-      Key: this.keyPath(file.getKey())
+      Key: this.keyPath(file.getKey()),
+      ServerSideEncryption: this.plugin.getBucketEncryptiom()
     };
 
     return this.awsRequest('S3:putObject', params, { checkError: true })
@@ -77,6 +79,7 @@ class UploadService extends AbstractService {
     const params = {
       Bucket: this.bucketName,
       Key: this.dependenceFilename,
+      ServerSideEncryption: this.plugin.getBucketEncryptiom(),
       Body: fs.createReadStream(this.plugin.settings.dependenciesPath)
     };
 

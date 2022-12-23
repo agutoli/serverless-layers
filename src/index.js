@@ -126,6 +126,13 @@ class ServerlessLayers {
   }
 
   mergeCommonSettings(inboundSetting) {
+    const { deploymentBucketObject } = this.service.provider;
+
+    let layersDeploymentBucketEncryption;
+    if (deploymentBucketObject) {
+      layersDeploymentBucketEncryption = deploymentBucketObject.serverSideEncryption;
+    }
+
     return {
       path: '.',
       functions: null,
@@ -134,6 +141,7 @@ class ServerlessLayers {
       compileDir: '.serverless',
       customInstallationCommand: null,
       layersDeploymentBucket: this.service.provider.deploymentBucket,
+      layersDeploymentBucketEncryption,
       ...this.runtimes.getDefaultSettings(inboundSetting)
     };
   }
@@ -321,6 +329,10 @@ class ServerlessLayers {
 
   getStackName() {
     return this.provider.naming.getStackName();
+  }
+
+  getBucketEncryptiom() {
+    return this.settings.layersDeploymentBucketEncryption;
   }
 
   getBucketName() {
