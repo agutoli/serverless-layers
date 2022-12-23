@@ -9,6 +9,7 @@ class AbstractService {
     this.stackName = plugin.getStackName();
     this.layerName = plugin.getLayerName();
     this.bucketName = plugin.getBucketName();
+    this.bucketEncryption = plugin.getBucketEncryptiom();
     this.provider = this.plugin.provider;
 
     this.dependenceFilename = path.join(plugin.getBucketLayersPath(), this.plugin.settings.dependenciesPath);
