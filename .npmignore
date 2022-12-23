@@ -6,3 +6,5 @@ bin/*
 src/*
 demos/*
 tests/*
+.serverless
+.github
