@@ -92,7 +92,7 @@ functions:
 | layersDeploymentBucket | `string` |  | You can specify a bucket to upload lambda layers. `Required if deploymentBucket is not defined.` |
 | customInstallationCommand | `string` |  | It specify a custom command to install deps ex. `MY_ENV=1 npm --proxy http://myproxy.com i -P` |
 | customHash | `string` |  | Can specify custom string, that once changed will force a new build of the layer
-| retainVersions | `int` |  | Number of layer versions to keep, the rest versions will be removed after deployments |
+| retainVersions | `int` | `null` | Number of layer versions to keep, the rest versions will be removed after deployments |
 
 
 ## NodeJS
