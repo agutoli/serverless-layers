@@ -14,6 +14,7 @@ describe('Runtime', () => {
       plugin = {
         log: sinon.stub(),
         error: sinon.stub(),
+        warn: sinon.stub()
       };
 
       lodashSet(plugin, 'service.provider.runtime', 'nodejs12.x');
@@ -47,7 +48,7 @@ describe('Runtime', () => {
       });
 
       it('checks if version is compatible', () => {
-        
+
         return runtimes._runtime.isCompatibleVersion('v12.16').then((res) => {
           expect(res.isCompatible).to.equal(true);
         })

@@ -37,9 +37,9 @@ class Runtimes {
     this._runtime.isCompatibleVersion(runtime)
       .then((data) => {
         if (!data.isCompatible) {
-          this.plugin.error('=============================================================');
-          this.plugin.error(`NOTE: You're currently using incompatible version [${data.version.replace('\n', '')}]`);
-          this.plugin.error('=============================================================\n');
+          this.plugin.warn('=============================================================');
+          this.plugin.warn(`WARN: The current environment and Lambda runtime don't match (current=${data.version.replace('\n', '')} vs runtime=${runtime}).`);
+          this.plugin.warn('=============================================================\n');
         }
       });
   }

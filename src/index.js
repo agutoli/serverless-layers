@@ -36,6 +36,9 @@ class ServerlessLayers {
       'after:deploy:function:deploy': () => BbPromise.bind(this)
         .then(() => this.init())
         .then(() => this.finalizeDeploy()),
+      'after:deploy:deploy': () => BbPromise.bind(this)
+        .then(() => this.init())
+        .then(() => this.cleanUpLayerVersions()),
       'plugin:uninstall:uninstall': () => BbPromise.bind(this)
         .then(() => {
           return this.init()
@@ -113,6 +116,30 @@ class ServerlessLayers {
     }
   }
 
+  async cleanUpLayerVersions() {
+    this.runtimes = new Runtimes(this);
+    const settings = this.getSettings();
+
+    for (const layerName in settings) {
+      const currentSettings = settings[layerName];
+      this.logGroup(layerName);
+
+      if (currentSettings.arn) {
+        this.warn(` (skipped) arn: ${currentSettings.arn}`);
+        continue;
+      }
+
+      if (!currentSettings.retainVersions) {
+        continue;
+      }
+
+      this.log('Cleaning up layer versions...');
+
+      await this.initServices(layerName, currentSettings);
+      await this.cleanUpLayers(currentSettings.retainVersions);
+    }
+  }
+
   async initServices(layerName, settings) {
     this.currentLayerName = layerName;
     this.settings = settings;
@@ -137,6 +164,7 @@ class ServerlessLayers {
       path: '.',
       functions: null,
       forceInstall: false,
+      retainVersions: null,
       dependencyInstall: true,
       compileDir: '.serverless',
       customInstallationCommand: null,
@@ -525,8 +553,8 @@ class ServerlessLayers {
     console.log('...' + chalk.red(`${signal} ${chalk.white.bold(msg)}`));
   }
 
-  cleanUpLayers() {
-    return this.layersService.cleanUpLayers();
+  cleanUpLayers(retainVersions) {
+    return this.layersService.cleanUpLayers(retainVersions);
   }
 
   breakLine() {
