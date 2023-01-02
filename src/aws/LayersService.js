@@ -23,7 +23,6 @@ class LayersService extends AbstractService {
   }
 
   async cleanUpLayers(retainVersions = 0) {
-    const { retainVersions } = this.plugin.settings;
     const params = {
       LayerName: this.layerName
     };
@@ -35,7 +34,7 @@ class LayersService extends AbstractService {
       return;
     }
 
-    if (retainVersions) {
+    if (this.plugin.settings.retainVersions) {
       const deletionCandidates = this.selectVersionsToDelete(response.LayerVersions, retainVersions);
 
       const deleteQueue = deletionCandidates.map((layerVersion) => {
