@@ -9,9 +9,9 @@ const copyFile = require('fs-copy-file'); // node v6.10.3 support
 
 const AbstractService = require('../AbstractService');
 
-function resolveFile(from) {
+function resolveFile(from, opts = {}) {
   return new Promise((resolve, reject) => {
-    glob(from, {}, (err, files) => {
+    glob(from, opts, (err, files) => {
       if (err) return reject();
       return resolve(files);
     });
@@ -29,6 +29,46 @@ class Dependencies extends AbstractService {
     const rooPath = path.join(settings.path, settings.dependenciesPath);
 
     return path.resolve(rooPath);
+  }
+
+  /**
+   * Implementing package pattern ignore
+   * https://github.com/agutoli/serverless-layers/issues/118
+   */
+  async excludePatternFiles() {
+    let filesToIgnore = [];
+    let filesToExclude = [];
+
+    /**
+     * Patterns allows you to define globs that will be excluded / included from the
+     * resulting artifact. If you wish to exclude files you can use a glob pattern prefixed
+     * with ! such as !exclude-me/**. Serverless will run the glob patterns in order so
+     * you can always re-include previously excluded files and directories.
+     *
+     * Reference: https://www.serverless.com/framework/docs/providers/aws/guide/packaging
+     */
+    for (let pattern of this.plugin.service.package.patterns) {
+      if (pattern.startsWith('!')) {
+        const resolvedFiles = await resolveFile(pattern.substr(1), {
+          cwd: this.layersPackageDir
+        });
+        filesToIgnore = filesToIgnore.concat(resolvedFiles);
+      } else {
+        // change directory
+        const resolvedFiles = await resolveFile(pattern, {
+          cwd: this.layersPackageDir
+        });
+        filesToExclude = filesToExclude.concat(resolvedFiles);
+      }
+    }
+
+    filesToExclude.forEach((filename) => {
+      // check if folder or files are being ignored, and shouldn't be removed.
+      const shouldBeIgnored = filesToIgnore.filter(x => x.startsWith(filename)).length > 0;
+      if (!shouldBeIgnored) {
+        fs.rmSync(path.join(this.layersPackageDir, filename), {force: true, recursive: true});
+      }
+    });
   }
 
   async run(cmd) {
@@ -104,6 +144,9 @@ class Dependencies extends AbstractService {
         console.log(e);
       }
     }
+
+    // cleanup files
+    await this.excludePatternFiles();
   }
 }
 
