@@ -91,7 +91,7 @@ class ServerlessLayers {
         continue;
       }
 
-      this.logGroup(layerName);
+      this.logGroup(layerName); 
       await this.initServices(layerName, currentSettings);
       await this.main();
     }
