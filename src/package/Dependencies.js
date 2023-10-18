@@ -47,7 +47,7 @@ class Dependencies extends AbstractService {
      *
      * Reference: https://www.serverless.com/framework/docs/providers/aws/guide/packaging
      */
-    for (let pattern of this.plugin.service.package.patterns) {
+    for (let pattern of this.plugin.settings.layerOptimization.cleanupPatterns) {
       if (pattern.startsWith('!')) {
         const resolvedFiles = await resolveFile(pattern.substr(1), {
           cwd: this.layersPackageDir
@@ -65,7 +65,9 @@ class Dependencies extends AbstractService {
     filesToExclude.forEach((filename) => {
       // check if folder or files are being ignored, and shouldn't be removed.
       const shouldBeIgnored = filesToIgnore.filter(x => x.startsWith(filename)).length > 0;
+
       if (!shouldBeIgnored) {
+        this.plugin.warn(`[layerOptimization.cleanupPatterns] Ignored: ${filename}`);
         fs.rmSync(path.join(this.layersPackageDir, filename), {force: true, recursive: true});
       }
     });
@@ -146,7 +148,16 @@ class Dependencies extends AbstractService {
     }
 
     // cleanup files
-    await this.excludePatternFiles();
+    try {
+      await this.excludePatternFiles();
+    } catch(err) {
+      if (!this.plugin.service.package.patterns) {
+        this.plugin.warn(`[warning] package.patterns option is not set. @see https://www.serverless.com/framework/docs/providers/aws/guide/packaging`);
+      } else {
+        console.error(err);
+        process.exit(1);
+      }
+    }
   }
 }
 

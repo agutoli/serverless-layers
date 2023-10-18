@@ -110,6 +110,7 @@ functions:
 | packagePath    |  `string` | package.json | `(DEPRECATED)`: Available for `<= 1.5.0`, for versions `>= 2.x` please use `compatibleRuntimes` |
 | dependenciesPath   |  `string` | package.json | Note: `>= 2.x` versions. You can specify custom path for your package.json |
 | compatibleRuntimes |  `array` | `['nodejs']` | Possible values: nodejs, nodejs10.x, nodejs12.x |
+| layerOptimization.cleanupPatterns | `array` | [check](https://github.com/agutoli/serverless-layers/blob/master/src/runtimes/nodejs.js) | The pattern of files to cleanup in the layer artifact before uploading it. |
 
 ----------------------
 
@@ -126,6 +127,7 @@ functions:
 | packageManager |  `string` |    bundle      | Possible values: bundle |
 | dependenciesPath   |  `string` | Gemfile | Note: Available for `>= 2.x` versions. You can specify custom path for your requirements.txt |
 | compatibleRuntimes |  `array` | `['ruby']` | Possible values: ruby2.5, ruby2.7 |
+| layerOptimization.cleanupPatterns | `array` | [check](https://github.com/agutoli/serverless-layers/blob/master/src/runtimes/ruby.js) | The pattern of files to cleanup in the layer artifact before uploading it. |
 
 ----------------------
 
@@ -140,7 +142,8 @@ functions:
 | -------------- | --------- | ----------- | ----------- |
 | packageManager |  `string` |    pip      | Possible values: pip |
 | dependenciesPath   |  `string` | requirements.txt | Note: Available for `>= 2.x` versions. You can specify custom path for your requirements.txt |
-| compatibleRuntimes |  `array` | `['python']` | Possible values: python2.7, python3.6, python3.7 and python3.8 |
+| compatibleRuntimes |  `array` | `['python']` | Possible values: python2.7, python3.x |
+| layerOptimization.cleanupPatterns | `array` | [check](https://github.com/agutoli/serverless-layers/blob/master/src/runtimes/python.js) | The pattern of files to cleanup in the layer artifact before uploading it. |
 
 ----------------------
 
@@ -151,7 +154,7 @@ This plugin will setup follow options automatically if not specified at `serverl
 |     Option     |    Type   |   Default   |
 | -------------- | --------- | ----------- |
 | package.individually | `bool` | false    |
-| package.exclude | `array` | `['node_modules/**']` |
+| package.patterns | `array` | `['node_modules/**']` |
 | package.excludeDevDependencies | `bool` | false |
 
 ## Mininal Policy permissions for CI/CD IAM users

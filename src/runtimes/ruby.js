@@ -22,13 +22,19 @@ class RubyRuntime {
       copyAfterInstall: [
         { from: 'ruby', to: 'gems' }
       ],
-      packageExclude: [
-        'node_modules/**',
-        'package.json',
-        'package-lock.json',
-        'vendor/**',
-        '.bundle'
-      ]
+      packagePatterns: [
+        '!node_modules/**',
+        '!package.json',
+        '!package-lock.json',
+        '!vendor/**',
+        '!.bundle'
+      ],
+      layerOptimization: {
+        cleanupPatterns: [
+          "node_modules/**/*.pyc",
+          "node_modules/**/*.md",
+        ]
+      }
     };
 
     this.commands = {
