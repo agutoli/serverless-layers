@@ -16,11 +16,17 @@ class PythonRuntime {
       compatibleRuntimes: [runtime],
       compatibleArchitectures: parent.compatibleArchitectures,
       copyBeforeInstall: [],
-      packageExclude: [
-        'package.json',
-        'package-lock.json',
-        'node_modules/**',
-      ]
+      packagePatterns: [
+        '!package.json',
+        '!package-lock.json',
+        '!node_modules/**',
+      ],
+      layerOptimization: {
+        cleanupPatterns: [
+          "node_modules/**/*.pyc",
+          "node_modules/**/*.md",
+        ]
+      }
     };
 
     this.commands = {

@@ -199,13 +199,11 @@ class ServerlessLayers {
       return false;
     }
 
-    // by pass settings
-    if (!this.settings.localDir) {
-      return false;
-    }
-
     const manifest = '__meta__/manifest-settings.json';
-    const currentSettings = JSON.stringify(this.settings);
+    const currentSettings = JSON.stringify({
+      ...this.settings,
+      patterns: this.service.package.patterns
+    });
 
     // settings checked
     this.hasSettingsVerified = true;
@@ -305,7 +303,7 @@ class ServerlessLayers {
       hasDepsChanges,
       hasFoldersChanges,
       hasSettingsChanges,
-      hasCustomHashChanged
+      hasCustomHashChanged,
     ].some(x => x === true);
 
     // merge package default options
@@ -423,26 +421,26 @@ class ServerlessLayers {
   }
 
   mergePackageOptions() {
-    const { packageExclude, artifact } = this.settings;
+    const { packagePatterns, artifact } = this.settings;
     const pkg = this.service.package;
 
     const opts = {
       individually: false,
       excludeDevDependencies: false,
-      exclude: []
+      patterns: []
     };
 
     this.service.package = {...opts, ...pkg};
 
-    for (const excludeFile of packageExclude) {
-      const hasRule = (this.service.package.exclude || '').indexOf(excludeFile);
+    for (const excludeFile of packagePatterns) {
+      const hasRule = (this.service.package.patterns || '').indexOf(excludeFile);
       if (hasRule === -1) {
-        this.service.package.exclude.push(excludeFile);
+        this.service.package.patterns.push(excludeFile);
       }
     }
 
     if (artifact) {
-      this.service.package.exclude.push(artifact);
+      this.service.package.patterns.push(artifact);
     }
   }
 
