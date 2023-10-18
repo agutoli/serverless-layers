@@ -44,5 +44,5 @@ module.exports = {
     "arm64"
   ],
   copyBeforeInstall: [ '.npmrc', 'yarn.lock', 'package-lock.json' ],
-  packageExclude: [ '!node_modules/**' ]
+  packagePatterns: [ '!node_modules/**' ]
 }
