@@ -7,7 +7,6 @@ module.exports = {
   dependenciesPath: './fixtures/package.json',
   layerOptimization: {
     cleanupPatterns: [
-      "node_modules/aws-sdk/**",
       "node_modules/**/.github",
       "node_modules/**/.git/*",
       "node_modules/**/.lint",
