@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 class PythonRuntime {
   constructor(parent, runtime, runtimeDir) {
@@ -10,7 +11,7 @@ class PythonRuntime {
       runtime,
       runtimeDir,
       libraryFolder: 'site-packages',
-      packageManager:  'pip',
+      packageManager: 'pip',
       packageManagerExtraArgs: '',
       dependenciesPath: 'requirements.txt',
       compatibleRuntimes: [runtime],
@@ -77,6 +78,10 @@ class PythonRuntime {
     }
 
     return isDifferent;
+  }
+
+  getDependenciesChecksum() {
+    return crypto.createHash('md5').update(JSON.stringify(this.localPackage)).digest('hex');
   }
 }
 

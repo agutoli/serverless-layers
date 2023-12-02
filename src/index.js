@@ -52,7 +52,7 @@ class ServerlessLayers {
     };
   }
 
-  async init () {
+  async init() {
     if (this.initialized) {
       return;
     }
@@ -73,7 +73,7 @@ class ServerlessLayers {
     }
   }
 
-  async deployLayers () {
+  async deployLayers() {
     this.runtimes = new Runtimes(this);
     const settings = this.getSettings();
 
@@ -99,7 +99,7 @@ class ServerlessLayers {
     this.breakLine();
   }
 
-  async cleanUpAllLayers () {
+  async cleanUpAllLayers() {
     this.runtimes = new Runtimes(this);
     const settings = this.getSettings();
     for (const layerName in settings) {
@@ -116,7 +116,7 @@ class ServerlessLayers {
     }
   }
 
-  async cleanUpLayerVersions () {
+  async cleanUpLayerVersions() {
     this.runtimes = new Runtimes(this);
     const settings = this.getSettings();
 
@@ -140,7 +140,7 @@ class ServerlessLayers {
     }
   }
 
-  async initServices (layerName, settings) {
+  async initServices(layerName, settings) {
     this.currentLayerName = layerName;
     this.settings = settings;
     this.zipService = new ZipService(this);
@@ -152,7 +152,7 @@ class ServerlessLayers {
     this.initialized = true;
   }
 
-  mergeCommonSettings (inboundSetting) {
+  mergeCommonSettings(inboundSetting) {
     const { deploymentBucketObject } = this.service.provider;
 
     let layersDeploymentBucketEncryption;
@@ -174,7 +174,7 @@ class ServerlessLayers {
     };
   }
 
-  getSettings () {
+  getSettings() {
     const inboundSettings = (this.serverless.service.custom || {})[
       'serverless-layers'
     ];
@@ -193,7 +193,7 @@ class ServerlessLayers {
     }
   }
 
-  hasSettingsChanges () {
+  hasSettingsChanges() {
     // don't check settings changes twice
     if (this.hasSettingsVerified) {
       return false;
@@ -225,7 +225,7 @@ class ServerlessLayers {
     });
   }
 
-  async hasCustomHashChanged () {
+  async hasCustomHashChanged() {
     if (!this.settings.customHash) {
       return false;
     }
@@ -253,7 +253,7 @@ class ServerlessLayers {
     return true;
   }
 
-  async main () {
+  async main() {
     const {
       arn,
       localDir,
@@ -309,10 +309,16 @@ class ServerlessLayers {
     // merge package default options
     this.mergePackageOptions();
 
+    let existentLayerArn = '';
+    const versionKey =
+      (this.runtimes.getDependenciesChecksum()) +
+      (this.settings.customHash ? '.' + this.settings.customHash : '');
+
     // If nothing has changed, confirm layer with same checksum
-    const existentLayerArn = !verifyChanges
-      ? await this.layersService.checkLayersForChecksum(await this.zipService.getChecksum(artifact))
-      : ''
+    if (!verifyChanges) {
+      this.log('Checking if layer already exists...')
+      existentLayerArn = await this.layersService.checkLayersForVersionKey(versionKey);
+    }
 
     // It improves readability
     const skipInstallation = (
@@ -324,9 +330,9 @@ class ServerlessLayers {
      * it doesn't require re-installing dependencies.
      */
     if (skipInstallation) {
-      this.log(`${chalk.inverse.green(' No changes ')}! Using same layer arn: ${this.logArn(existentLayerArn)}`);
-      this.relateLayerWithFunctions(existentLayerArn);
-      return;
+     this.log(`${chalk.inverse.green(' No changes ')}! Using same layer arn: ${this.logArn(existentLayerArn)}`);
+     this.relateLayerWithFunctions(existentLayerArn);
+     return;
     }
 
     // ENABLED by default
@@ -340,13 +346,13 @@ class ServerlessLayers {
 
     await this.zipService.package();
     await this.bucketService.uploadZipFile();
-    const version = await this.layersService.publishVersion();
+    const version = await this.layersService.publishVersion(versionKey);
     await this.bucketService.putFile(this.dependencies.getDepsPath());
 
     this.relateLayerWithFunctions(version.LayerVersionArn);
   }
 
-  getLayerName () {
+  getLayerName() {
     const stackName = this.getStackName();
     const { runtimeDir } = this.settings;
     return slugify(`${stackName}-${runtimeDir}-${this.currentLayerName}`, {
@@ -355,15 +361,15 @@ class ServerlessLayers {
     });
   }
 
-  getStackName () {
+  getStackName() {
     return this.provider.naming.getStackName();
   }
 
-  getBucketEncryptiom () {
+  getBucketEncryptiom() {
     return this.settings.layersDeploymentBucketEncryption;
   }
 
-  getBucketName () {
+  getBucketName() {
     if (!this.settings.layersDeploymentBucket) {
       throw new Error(
         'Please, you should specify "deploymentBucket" or "layersDeploymentBucket" option for this plugin!\n'
@@ -372,14 +378,14 @@ class ServerlessLayers {
     return this.settings.layersDeploymentBucket;
   }
 
-  getPathZipFileName () {
+  getPathZipFileName() {
     if (this.settings.artifact) {
       return `${path.join(process.cwd(), this.settings.artifact)}`;
     }
     return `${path.join(process.cwd(), this.settings.compileDir, this.getLayerName())}.zip`;
   }
 
-  getBucketLayersPath () {
+  getBucketLayersPath() {
     const serviceStage = `${this.serverless.service.service}/${this.options.stage}`;
 
     let deploymentPrefix = 'serverless';
@@ -394,7 +400,7 @@ class ServerlessLayers {
     ).replace(/\\/g, '/');
   }
 
-  async getLayerArn () {
+  async getLayerArn() {
     if (!this.cacheObject.layersArn) {
       this.cacheObject.layersArn = {};
     }
@@ -418,11 +424,11 @@ class ServerlessLayers {
     return arn;
   }
 
-  getOutputLogicalId () {
+  getOutputLogicalId() {
     return this.provider.naming.getLambdaLayerOutputLogicalId(this.getLayerName());
   }
 
-  mergePackageOptions () {
+  mergePackageOptions() {
     const { packagePatterns, artifact } = this.settings;
     const pkg = this.service.package;
 
@@ -432,7 +438,7 @@ class ServerlessLayers {
       patterns: []
     };
 
-    this.service.package = { ...opts, ...pkg };
+    this.service.package = {...opts, ...pkg};
 
     for (const excludeFile of packagePatterns) {
       const hasRule = (this.service.package.patterns || '').indexOf(excludeFile);
@@ -446,7 +452,7 @@ class ServerlessLayers {
     }
   }
 
-  relateLayerWithFunctions (layerArn) {
+  relateLayerWithFunctions(layerArn) {
     this.log('Adding layers...');
     const { functions } = this.service;
     const funcs = this.settings.functions;
@@ -507,13 +513,13 @@ class ServerlessLayers {
     });
   }
 
-  getDependenciesList () {
-    return Object.keys((this.localPackage.dependencies || [])).map(x => (
+  getDependenciesList() {
+    return Object.keys((this.localPackage.dependencies||[])).map(x => (
       `${x}@${this.localPackage.dependencies[x]}`
     ));
   }
 
-  async finalizeDeploy () {
+  async finalizeDeploy() {
     const cliOpts = this.provider.options;
     this.logGroup("Layers Info");
     Object.keys(this.service.functions).forEach(funcName => {
@@ -536,36 +542,36 @@ class ServerlessLayers {
     this.breakLine();
   }
 
-  log (msg, signal = ' ○') {
+  log(msg, signal=' ○') {
     console.log('...' + `${chalk.greenBright.bold(signal)} ${chalk.white(msg)}`);
   }
 
-  logGroup (msg) {
+  logGroup(msg) {
     this.breakLine();
     this.serverless.cli.log(`[ LayersPlugin ]: ${chalk.magenta.bold('=>')} ${chalk.greenBright.bold(msg)}`);
   }
 
-  warn (msg, signal = ' ∅') {
+  warn(msg, signal=' ∅') {
     console.log('...' + chalk.yellowBright(`${chalk.yellowBright.bold(signal)} ${msg}`));
   }
 
-  error (msg, signal = ' ⊗') {
+  error(msg, signal=' ⊗') {
     console.log('...' + chalk.red(`${signal} ${chalk.white.bold(msg)}`));
   }
 
-  cleanUpLayers (retainVersions) {
+  cleanUpLayers(retainVersions) {
     return this.layersService.cleanUpLayers(retainVersions);
   }
 
-  breakLine () {
+  breakLine() {
     console.log('\n');
   }
 
-  logArn (arn) {
+  logArn(arn) {
     let pattern = /arn:aws:lambda:([^:]+):([0-9]+):layer:([^:]+):([0-9]+)/g;
     let region = chalk.bold('$1');
     let name = chalk.magenta('$3');
-    let formated = chalk.white(`arn:aws:lambda:${region}:*********:${name}:$4`);
+    let formatted = chalk.white(`arn:aws:lambda:${region}:*********:${name}:$4`);
 
     let text = "";
     switch (typeof arn) {
@@ -582,7 +588,7 @@ class ServerlessLayers {
         text = String(arn);
         break;
     }
-    return text.replace(pattern, formated);
+    return text.replace(pattern, formatted);
   }
 }
 

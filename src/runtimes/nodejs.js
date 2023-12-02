@@ -1,4 +1,5 @@
 const path = require('path');
+const crypto = require('crypto');
 
 class NodeJSRuntime {
   constructor(parent, runtime, runtimeDir) {
@@ -9,7 +10,7 @@ class NodeJSRuntime {
       runtime,
       runtimeDir,
       libraryFolder: 'node_modules',
-      packageManager:  'npm',
+      packageManager: 'npm',
       packageManagerExtraArgs: '',
       dependenciesPath: 'package.json',
       compatibleRuntimes: [runtimeDir],
@@ -123,6 +124,10 @@ class NodeJSRuntime {
     }
 
     return isDifferent;
+  }
+
+  getDependenciesChecksum() {
+    return crypto.createHash('md5').update(JSON.stringify(this.localPackage.dependencies)).digest('hex');
   }
 }
 
