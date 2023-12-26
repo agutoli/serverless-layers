@@ -26,6 +26,10 @@ export class LayerConfig {
     return (this._config[key as Config.CustomConfigsKey] as unknown) as T;
   }
 
+  getRuntimePackagePatterns(): string[] {
+    return this.get();
+  }
+
   compileDirAbsPath(): string {
     return path.join(
       this.get<string>('path'),

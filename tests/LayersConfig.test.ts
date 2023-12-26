@@ -91,10 +91,7 @@ describe('LayerConfig', () => {
           'yarn.lock',
           'package-lock.json'
         ],
-        copyAfterInstall: [],
-        packageExclude: [
-          'node_modules/**',
-        ]
+        copyAfterInstall: []
       });
     });
   });
@@ -141,14 +138,16 @@ describe('LayerConfig', () => {
         copyBeforeInstall: [
           'Gemfile.lock'
         ],
-        packageExclude: [
-          'yarn.lock',
-          'package.json',
-          'package-lock.json',
-          'node_modules/**',
-          'vendor/**',
-          '.bundle'
-        ]
+        serverless: {
+          package: [
+            'yarn.lock',
+            'package.json',
+            'package-lock.json',
+            'node_modules/**',
+            'vendor/**',
+            '.bundle'
+          ]
+        }
       });
     });
   });

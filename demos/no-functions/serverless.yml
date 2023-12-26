@@ -1,0 +1,24 @@
+service: no-functions
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs14.x
+  deploymentBucket:
+    name: agutoli-my-test-bucket
+
+custom:
+  serverless-layers:
+    - my-local-folder:
+        dependenciesPath: ./package.json
+        localDir:
+          name: my-lib-name
+          path: ./myLocalLibSource
+          folders:
+            include:
+              - '*.js'
+            exclude:
+              - node_modules
+
+plugins:
+  - ../../src

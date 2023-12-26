@@ -20,6 +20,7 @@ interface IServerlessFacade {
   attachLayerByArn(arn: string): void;
   getServerlessVersion(): string;
   getCustomConfigs(): KeyValue<Config.CustomConfigs>[];
+  getPackagePatterns(): string[];
   defineCustomProperties(properties: KeyValue): void;
   getDeploymentBucketName(): string | undefined;
 }

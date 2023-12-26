@@ -1,5 +1,7 @@
 import type Serverless from 'serverless';
 import type AwsProvider from 'serverless/aws';
+
+import {Config} from '../types/config';
 import type Service from 'serverless/classes/Service';
 
 /**
@@ -44,6 +46,17 @@ export class ServerlessFacade implements IServerlessFacade {
 
   getFunctions(): AwsProvider.Functions {
     return this._service.functions;
+  }
+
+  getPackagePatterns(): string[] {
+    if (!this._service.package?.patterns) {
+      return [];
+    }
+    return this._service.package?.patterns;
+  }
+
+  updatePackagePatterns(patterns: string[]) {
+    this._service.package.patterns = patterns;
   }
 
   attachLayerByArn(arn: string): void {

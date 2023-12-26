@@ -1,0 +1,12 @@
+{
+  "name": "local-folders-layers",
+  "description": "",
+  "version": "0.1.0",
+  "dependencies": {},
+  "scripts": {
+    "deploy": "sls deploy --aws-profile bruno-test"
+  },
+  "devDependencies": {
+    "serverless-layers": "2.1.3"
+  }
+}

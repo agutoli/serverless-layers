@@ -1,0 +1,19 @@
+service: simple-nodejs
+
+provider:
+  name: aws
+  region: ap-southeast-2
+  runtime: nodejs16.x
+  deploymentBucket:
+    name: rotor-serverless-deployments-ap-southeast-2-060094158991
+
+# custom:
+#   serverless-layers:
+#     arn: arn:aws:lambda:us-east-1:<your_account>:layer:node-v13-11-0:5
+
+functions:
+  hello:
+    handler: handler.hello
+
+plugins:
+  - ../../src

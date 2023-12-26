@@ -14,12 +14,9 @@ export class PythonRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdap
     libraryFolder: 'site-packages',
     copyBeforeInstall: [],
     copyAfterInstall: [],
-    packageExclude: [
-      'yarn.lock',
-      'package.json',
-      'package-lock.json',
-      'node_modules/**'
-    ],
+    optimization: {
+      cleanupPatterns: []
+    },
     serverless: {
       package: {
         individually: true

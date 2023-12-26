@@ -1,0 +1,12 @@
+{
+  "name": "nodejs-basic",
+  "description": "",
+  "version": "0.1.0",
+  "scripts": {
+    "deploy": "sls deploy",
+    "destroy": "sls remove --stage dev"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

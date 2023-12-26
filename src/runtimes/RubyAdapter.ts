@@ -17,14 +17,16 @@ export class RubyRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdapte
     copyAfterInstall: [
       { from: 'ruby', to: 'gems' }
     ],
-    packageExclude: [
-      'yarn.lock',
-      'package.json',
-      'package-lock.json',
-      'node_modules/**',
-      'vendor/**',
-      '.bundle'
-    ],
+    optimization: {
+      cleanupPatterns: [
+        'yarn.lock',
+        'package.json',
+        'package-lock.json',
+        'node_modules/**',
+        'vendor/**',
+        '.bundle'
+      ]
+    },
     serverless: {
       package: {
         individually: true

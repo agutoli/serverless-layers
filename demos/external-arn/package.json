@@ -1,0 +1,12 @@
+{
+  "name": "demo-layer-arn",
+  "description": "",
+  "version": "0.1.0",
+  "scripts": {
+    "deploy": "sls deploy --aws-profile bruno-test",
+    "destroy": "sls remove --stage dev --aws-profile bruno-test"
+  },
+  "dependencies": {
+    "express": "4.18.1"
+  }
+}

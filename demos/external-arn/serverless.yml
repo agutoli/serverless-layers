@@ -1,0 +1,32 @@
+service: external-arn
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs14.x
+  deploymentBucket:
+    name: agutoli-my-test-bucket
+    serverSideEncryption: AES256
+
+custom:
+  serverless-layers:
+    - default:
+        retainVersions: 3
+        functions:
+          - func1
+        dependenciesPath: ./package.json
+    - external-arn:
+        retainVersions: 3
+        functions:
+          - func1
+          - func2
+        arn: arn:aws:lambda:us-east-1:336870424643:layer:no-functions-dev-nodejs-my-local-folder:1
+
+functions:
+  func1:
+    handler: handler.hello
+  func2:
+    handler: handler.hello
+
+plugins:
+  - ../../src
