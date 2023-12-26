@@ -2,10 +2,13 @@
   "name": "demo-layers-nodejs",
   "version": "1.0.0",
   "description": "",
+  "scripts": {
+    "pack": "sls"
+  },
   "devDependencies": {
     "jest": "^28.1.1"
   },
   "dependencies": {
-    "serverless": "^3.19.0"
+    "serverless": "^3.38.0"
   }
 }

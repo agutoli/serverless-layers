@@ -1,5 +1,6 @@
 import Err from '../core/errors';
 
+import {Config} from '../types/config';
 import {RuntimeAdapter} from './Adapter';
 import {LayerConfig} from '../core/LayerConfig';
 
@@ -19,6 +20,13 @@ export class PythonRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdap
     },
     serverless: {
       package: {
+        patterns: [
+          '!.npmrc',
+          '!.gitignore',
+          '!README.md',
+          '!.vscode/',
+          '!.idea/',
+        ],
         individually: true
       }
     }

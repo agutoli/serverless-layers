@@ -1,4 +1,4 @@
-service: demo-simple-nodejs
+service: demo-app
 
 provider:
   name: aws
@@ -8,6 +8,8 @@ provider:
     name: agutoli-my-test-bucket
 
 package:
+  patterns:
+    - '!node_modules/**'
   individually: true
   excludeDevDependencies: false
 
@@ -18,7 +20,7 @@ custom:
           - hello
 
 functions:
-  hello:
+  myFunc:
     handler: handler.hello
 
 plugins:

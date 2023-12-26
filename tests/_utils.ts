@@ -37,6 +37,8 @@ export const mocksInit = {
       getOptions: jest.fn(),
       getFunctions: jest.fn(),
       attachLayerByArn: jest.fn(),
+      getPackagePatterns: jest.fn(),
+      updatePackagePatterns: jest.fn(),
       getCustomConfigs: jest.fn(() => opts.customConfigs || []),
       defineCustomProperties: jest.fn(),
       getServerlessVersion: jest.fn(() => opts.serverlessVersion),

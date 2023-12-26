@@ -1,8 +1,14 @@
+import type Service from 'serverless/classes/Service';
+
 declare namespace Config {
   /**
    * Supported Runtimes
    */
   type RuntimeIds = 'nodejs' | 'python' | 'ruby';
+
+  type OptimizationOpts = {
+    cleanupPatterns: []
+  };
 
   /**
    * The common configurations across
@@ -15,6 +21,27 @@ declare namespace Config {
     runtimeDir: string;
     compileDir: string;
     layerConfigKey: string;
+    optimization?: OptimizationOpts;
+    serverless?: Service;
+
+    // packageManager:  'bundle',
+    // dependenciesPath: 'Gemfile',
+    // packageManagerExtraArgs: '',
+    // libraryFolder: 'gems',
+    // copyBeforeInstall: [
+    //   'Gemfile.lock'
+    // ],
+    // copyAfterInstall: [
+    //   { from: 'ruby', to: 'gems' }
+    // ],
+    // serverless: {
+    //   package: {
+    //     individually: true
+    //   }
+    // }
+
+
+
     copyBeforeInstall: Array<string>;
     copyAfterInstall: Array<string>;
     layersDeploymentBucket?: string | undefined,

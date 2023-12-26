@@ -1,5 +1,6 @@
 import Err from '../core/errors';
 
+import {Config} from '../types/config';
 import {RuntimeAdapter} from './Adapter';
 
 export class NodeJsRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdapter {
@@ -56,7 +57,16 @@ export class NodeJsRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdap
     serverless: {
       package: {
         patterns: [
-          '!node_modules/**'
+          '!.npmrc',
+          '!.gitignore',
+          '!README.md',
+          '!.eslintrc',
+          '!.jshintrc',
+          '!.vscode/',
+          '!.idea/',
+          '!yarn.lock',
+          '!node_modules/**',
+          '!package-lock.json',
         ],
         individually: true
       }

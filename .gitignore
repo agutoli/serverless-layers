@@ -4,3 +4,5 @@ dist/
 docs/
 yarn-error.log
 .serverless
+demos
+lib

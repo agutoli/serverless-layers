@@ -4,8 +4,10 @@ import {NodeJsRuntimeAdapter} from '../src/runtimes/NodeJsAdapter';
 import {LayerConfig} from '../src/core/LayerConfig';
 import {State} from '../src/core/State';
 
+jest.mock('../src/usecases/PackOrDeployLayer/OptimizeBeforePack');
 jest.mock('../src/usecases/PackOrDeployLayer/ScenarioStaticLayerArnOption');
 
+import * as OptimizeBeforePack from '../src/usecases/PackOrDeployLayer/OptimizeBeforePack';
 import * as ScenarioStaticLayerArnOption from '../src/usecases/PackOrDeployLayer/ScenarioStaticLayerArnOption';
 import * as PackOrDeployLayer from '../src/usecases/PackOrDeployLayer';
 
@@ -45,20 +47,35 @@ const createInstance = (opts = {}) => {
 }
 
 describe('PackOrDeployLayer', () => {
-  it('Calls ScenarioStaticLayerArnOption when set "arn" option with static layer arn', async () => {
-    const arn = 'arn:aws:lambda:us-east-1:<your_account>:layer:node-v13-11-0:5';
-    const v = createInstance({arn});
+  let arn: any;
+  let instance: any;
+
+  beforeEach(async () => {
+    arn = 'arn:aws:lambda:us-east-1:<your_account>:layer:node-v13-11-0:5';
+    instance = createInstance({arn});
 
     await PackOrDeployLayer.UseCase({
-      state: v.state,
-      facade: v.facade,
-      runtime: v.runtime,
-      logging: v.logging,
-      layerConfig: v.layerConfig
+      state: instance.state,
+      facade: instance.facade,
+      runtime: instance.runtime,
+      logging: instance.logging,
+      layerConfig: instance.layerConfig
     });
+  });
 
+  it('Must call OptimizeBeforePack always', async () => {
+    expect(
+      OptimizeBeforePack.UseCase
+    ).toHaveBeenCalledWith({
+      facade: instance.facade,
+      logging: instance.logging,
+      layerConfig: instance.layerConfig,
+    });
+  });
+
+  it('Calls ScenarioStaticLayerArnOption when set "arn" option with static layer arn', async () => {
     expect(
       ScenarioStaticLayerArnOption.UseCase
-    ).toHaveBeenCalledWith(arn, {facade: v.facade});
+    ).toHaveBeenCalledWith(arn, {facade: instance.facade});
   });
 });

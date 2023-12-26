@@ -1,4 +1,6 @@
 import Err from './errors';
+
+import {Config} from '../types/config';
 import {LayerConfig} from './LayerConfig';
 
 export class RuntimeResolver {

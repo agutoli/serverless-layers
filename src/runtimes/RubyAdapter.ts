@@ -1,5 +1,6 @@
 import Err from '../core/errors';
 
+import {Config} from '../types/config';
 import {RuntimeAdapter} from './Adapter';
 
 export class RubyRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdapter {
@@ -18,17 +19,22 @@ export class RubyRuntimeAdapter extends RuntimeAdapter implements IRuntimeAdapte
       { from: 'ruby', to: 'gems' }
     ],
     optimization: {
-      cleanupPatterns: [
-        'yarn.lock',
-        'package.json',
-        'package-lock.json',
-        'node_modules/**',
-        'vendor/**',
-        '.bundle'
-      ]
+      cleanupPatterns: []
     },
     serverless: {
       package: {
+        patterns: [
+          '!.gitignore',
+          '!README.md',
+          '!.vscode/',
+          '!.idea/',
+          'yarn.lock',
+          'package.json',
+          'package-lock.json',
+          'node_modules/**',
+          'vendor/**',
+          '.bundle'
+        ],
         individually: true
       }
     }

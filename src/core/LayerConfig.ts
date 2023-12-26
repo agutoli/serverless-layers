@@ -1,8 +1,9 @@
 import path from 'path';
 
+import {Config} from '../types/config';
+
 export class LayerConfig {
   arn?: string;
-
   _config: Config.CustomConfigs;
 
   constructor(layerConfigKey: string, _config: Config.CustomConfigs) {
@@ -14,6 +15,8 @@ export class LayerConfig {
       forceInstall: false,
       dependencyInstall: true,
       compileDir: ".serverless",
+      optimization: false,
+      serverless: null,
       customInstallationCommand: null,
       compatibleArchitectures: ["x86_64", "arm64"],
     }, _config);
@@ -23,11 +26,11 @@ export class LayerConfig {
   }
 
   get<T>(key: Config.CustomConfigsKey): T {
-    return (this._config[key as Config.CustomConfigsKey] as unknown) as T;
+    return (this._config[key as Config.CustomConfigsKey]) as unknown as T;
   }
 
   getRuntimePackagePatterns(): string[] {
-    return this.get();
+    return this._config.serverless?.package.patterns || [];
   }
 
   compileDirAbsPath(): string {

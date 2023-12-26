@@ -19,6 +19,7 @@ import * as LayersRemoveCommand from './commands/LayersRemove';
 import * as LayersPackageCommand from './commands/LayersPackage';
 
 // UseCases
+// import * as OptimizeBeforePack from './usecases/OptimizeBeforePack';
 import * as PackOrDeployLayer from './usecases/PackOrDeployLayer';
 
 export class ServerlessLayers implements Plugin {
@@ -143,7 +144,19 @@ export class ServerlessLayers implements Plugin {
   }
 
   async compileLayersHook(layerConfig: LayerConfig): Promise<void> {
-    console.log('compileLayersHook:', { layerConfig });
+
+    // // // console.log('compileLayersHook:', { layerConfig });
+    // this.facade.updatePackagePatterns();
+
+    // const state = new State(this.facade, layerConfig);
+
+    // await OptimizeBeforePack.UseCase({
+    //   state,
+    //   layerConfig,
+    //   facade: this.facade,
+    //   runtime: this.runtime,
+    //   logging: this.logging
+    // });
   }
 
   /**
@@ -194,7 +207,6 @@ export class ServerlessLayers implements Plugin {
    */
   async packageHook(layerConfig: LayerConfig): Promise<void> {
     const state = new State(this.facade, layerConfig);
-
     await PackOrDeployLayer.UseCase({
       state,
       layerConfig,

@@ -1,4 +1,4 @@
-import Err from '../core/errors';
+// import Err from '../core/errors';
 import type Plugin from 'serverless/classes/Plugin';
 import {LayerConfig} from '../core/LayerConfig';
 

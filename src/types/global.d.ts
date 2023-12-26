@@ -19,10 +19,12 @@ interface IServerlessFacade {
   awsRequest<T>(serviceAction: string, params: unknown): Promise<T>;
   attachLayerByArn(arn: string): void;
   getServerlessVersion(): string;
+  getPackagePatterns(): string[];
   getCustomConfigs(): KeyValue<Config.CustomConfigs>[];
   getPackagePatterns(): string[];
   defineCustomProperties(properties: KeyValue): void;
   getDeploymentBucketName(): string | undefined;
+  updatePackagePatterns(patterns: string[]): void;
 }
 
 interface IRuntimeAdapter {

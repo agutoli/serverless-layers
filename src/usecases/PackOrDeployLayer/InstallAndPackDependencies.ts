@@ -9,6 +9,7 @@ import glob from 'glob';
 import strip from 'strip-comments';
 import type Plugin from 'serverless/classes/Plugin';
 
+import {Config} from '../../types/config';
 import {System} from '../../core/System';
 import {ZipLayer} from '../../core/ZipLayer';
 import {LayerConfig} from '../../core/LayerConfig';
@@ -62,10 +63,7 @@ export async function UseCase({
 
   // install packages
   console.log(await System.exec(installationCommand(layerConfig), layerPackagePath));
-
-  const {cleanupPatterns} = layerConfig.optimization;
-
-
+  const {cleanupPatterns} = layerConfig.get<Config.OptimizationOpts>("optimization");
 
   for (const cleanupPattern of cleanupPatterns) {
     const filesToRemove = await new Promise((resolve, reject) => {

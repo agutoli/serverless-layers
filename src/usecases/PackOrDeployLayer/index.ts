@@ -4,6 +4,7 @@ import {State} from '../../core/State';
 import {LayerConfig} from '../../core/LayerConfig';
 
 // auxiliar usecases
+import * as OptimizeBeforePack from './OptimizeBeforePack';
 import * as ScenarioStaticLayerArnOption from './ScenarioStaticLayerArnOption';
 
 type Injection = {
@@ -21,6 +22,10 @@ export async function UseCase ({
   logging,
   layerConfig
 } : Injection): Promise<void> {
+
+  // Optimize package ignoring files, removing garbages
+  OptimizeBeforePack.UseCase({ logging, facade, layerConfig });
+
   /**
    * Scenario: Attaching existent layer ARN to functions
    * - The "arn" option should be a valid ARN string
