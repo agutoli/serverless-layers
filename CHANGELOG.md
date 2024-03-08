@@ -1,3 +1,7 @@
+# 2.8.5 (2024-03-09)
+- [Bugfix: Look for matching layer](https://github.com/agutoli/serverless-layers/pull/157)
+- [Bugfix: Remove aws-sdk from nodejs layerOptimization.cleanupPatterns](https://github.com/agutoli/serverless-layers/pull/151)
+
 # 2.6.1 (2022-12-23)
 - [dependabot mocha](https://github.com/agutoli/serverless-layers/commit/4aca58091e6bf0472e12814513fd800590ae5705)
 - [Bugfix: Unable to attach layers to the existing lambda](https://github.com/agutoli/serverless-layers/issues/97)
