@@ -72,6 +72,10 @@ class Runtimes {
   hasDependenciesChanges() {
     return this._runtime.hasDependenciesChanges();
   }
+
+  getDependenciesChecksum() {
+    return this._runtime.getDependenciesChecksum();
+  }
 }
 
 module.exports = Runtimes;
