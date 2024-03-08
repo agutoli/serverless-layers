@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const lodashSet = require('lodash.set')
+const lodash = require('lodash')
 const sinon = require('sinon');
 const Runtime = require('runtimes');
 
@@ -17,7 +17,7 @@ describe('Runtime', () => {
         warn: sinon.stub()
       };
 
-      lodashSet(plugin, 'service.provider.runtime', 'nodejs12.x');
+      lodash.set(plugin, 'service.provider.runtime', 'nodejs12.x');
 
       runtimes = new Runtime(plugin);
     });
@@ -37,7 +37,7 @@ describe('Runtime', () => {
           }
         })
 
-        lodashSet(plugin, 'bucketService.downloadDependencesFile', () => Promise.resolve(remoteDeps));
+        lodash.set(plugin, 'bucketService.downloadDependencesFile', () => Promise.resolve(remoteDeps));
 
         plugin.settings = runtimes.getDefaultSettings({
           packageManager: 'yarn',
@@ -78,7 +78,7 @@ describe('Runtime', () => {
     });
 
     it('should throw error when undefined runtime', () => {
-      lodashSet(plugin, 'service.provider.runtime', undefined);
+      lodash.set(plugin, 'service.provider.runtime', undefined);
       runtimes = new Runtime(plugin);
       expect(plugin.error.calledWith('service.provider.runtime is required!'))
         .to.equal(true);
@@ -86,7 +86,7 @@ describe('Runtime', () => {
     })
 
     it('should throw error when invalid runtime', () => {
-      lodashSet(plugin, 'service.provider.runtime', 'invalid');
+      lodash.set(plugin, 'service.provider.runtime', 'invalid');
       runtimes = new Runtime(plugin);
       expect(plugin.log.calledWith('"invalid" runtime is not supported (yet).'))
         .to.equal(true);
