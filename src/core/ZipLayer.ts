@@ -28,7 +28,8 @@ const DEPLOYMENT_PACKAGE_KB_UNZIPPED = 250 * MB;
 export const folderSize = async (pathdir: string): Promise<number> => {
   const decimalBytes: number = 1000 ** 2;
   const binaryPrefixBytes: number = 1024 ** 2;
-  const decimal = await fastFolderSizeSync(pathdir) as number;
+  const decimal = fastFolderSizeSync(pathdir) as number;
+
    // converts size to binary prefix
   return Math.round((decimal / decimalBytes) * binaryPrefixBytes);
 };

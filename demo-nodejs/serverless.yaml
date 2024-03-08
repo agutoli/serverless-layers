@@ -22,6 +22,8 @@ custom:
 functions:
   myFunc:
     handler: handler.hello
+  hello:
+    handler: handler.hello
 
 plugins:
   - ../index.js

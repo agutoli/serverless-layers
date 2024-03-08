@@ -62,7 +62,7 @@ export async function UseCase({
   }
 
   // install packages
-  console.log(await System.exec(installationCommand(layerConfig), layerPackagePath));
+  console.log(System.exec(installationCommand(layerConfig), layerPackagePath));
   const {cleanupPatterns} = layerConfig.get<Config.OptimizationOpts>("optimization");
 
   for (const cleanupPattern of cleanupPatterns) {

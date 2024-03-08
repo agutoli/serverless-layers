@@ -40,8 +40,6 @@ declare namespace Config {
     //   }
     // }
 
-
-
     copyBeforeInstall: Array<string>;
     copyAfterInstall: Array<string>;
     layersDeploymentBucket?: string | undefined,
