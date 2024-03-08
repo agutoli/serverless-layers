@@ -2,3 +2,4 @@ node_modules/
 .serverless
 demos/simple/.serverless/*
 lib/*
+.DS_Store
