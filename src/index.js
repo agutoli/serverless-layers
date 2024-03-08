@@ -309,8 +309,16 @@ class ServerlessLayers {
     // merge package default options
     this.mergePackageOptions();
 
-    // It returns the layer arn if exists.
-    const existentLayerArn = await this.getLayerArn();
+    let existentLayerArn = '';
+    const versionKey =
+      (this.runtimes.getDependenciesChecksum()) +
+      (this.settings.customHash ? '.' + this.settings.customHash : '');
+
+    // If nothing has changed, confirm layer with same checksum
+    if (!verifyChanges) {
+      this.log('Checking if layer already exists...')
+      existentLayerArn = await this.layersService.checkLayersForVersionKey(versionKey);
+    }
 
     // It improves readability
     const skipInstallation = (
@@ -338,7 +346,7 @@ class ServerlessLayers {
 
     await this.zipService.package();
     await this.bucketService.uploadZipFile();
-    const version = await this.layersService.publishVersion();
+    const version = await this.layersService.publishVersion(versionKey);
     await this.bucketService.putFile(this.dependencies.getDepsPath());
 
     this.relateLayerWithFunctions(version.LayerVersionArn);
@@ -563,7 +571,7 @@ class ServerlessLayers {
     let pattern = /arn:aws:lambda:([^:]+):([0-9]+):layer:([^:]+):([0-9]+)/g;
     let region = chalk.bold('$1');
     let name = chalk.magenta('$3');
-    let formated = chalk.white(`arn:aws:lambda:${region}:*********:${name}:$4`);
+    let formatted = chalk.white(`arn:aws:lambda:${region}:*********:${name}:$4`);
 
     let text = "";
     switch (typeof arn) {
@@ -580,7 +588,7 @@ class ServerlessLayers {
         text = String(arn);
         break;
     }
-    return text.replace(pattern, formated);
+    return text.replace(pattern, formatted);
   }
 }
 

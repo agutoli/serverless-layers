@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-
+const crypto = require('crypto');
 
 class RubyRuntime {
   constructor(parent, runtime, runtimeDir) {
@@ -11,7 +11,7 @@ class RubyRuntime {
       runtime,
       runtimeDir,
       libraryFolder: 'gems',
-      packageManager:  'bundle',
+      packageManager: 'bundle',
       packageManagerExtraArgs: '',
       dependenciesPath: 'Gemfile',
       compatibleRuntimes: [runtime],
@@ -85,6 +85,10 @@ class RubyRuntime {
     }
 
     return isDifferent;
+  }
+
+  getDependenciesChecksum() {
+    return crypto.createHash('md5').update(JSON.stringify(this.localPackage)).digest('hex');
   }
 }
 
