@@ -157,12 +157,11 @@ functions:
 This plugin will set up the following options automatically if not specified in `serverless.yml`.
 
 | Option                      | Type     | Default         |
-|-----------------------------|----------|-----------------
+|-----------------------------|----------|-----------------|
+| package.individually           | `bool` | false                 |
+| package.patterns               | `array`| `['node_modules/**']` |
+| package.excludeDevDependencies | `bool` | false                 |
 
-|
-| package.individually        | `bool`   | false           |
-| package.patterns            | `array`  | `['node_modules/**']` |
-| package.excludeDevDependencies | `bool` | false           |
 
 ## Minimal Policy permissions for CI/CD IAM users
 
