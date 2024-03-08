@@ -1,10 +1,11 @@
 .travis.yml
 .eslintrc
+.serverless/*
 .editorconfig
 .babelrc
 bin/*
 src/*
 demos/*
 tests/*
-.serverless
 .github
+
