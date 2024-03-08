@@ -21,6 +21,7 @@ function resolveFile(from, opts = {}) {
 class Dependencies extends AbstractService {
   init() {
     this.layersPackageDir = this.getLayerPackageDir();
+    fs.rmSync(this.layersPackageDir, {force: true, recursive: true});
     return mkdirp.sync(this.layersPackageDir);
   }
 

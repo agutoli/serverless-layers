@@ -8,4 +8,4 @@ src/*
 demos/*
 tests/*
 .github
-
+dist/*
